@@ -7,6 +7,6 @@ defmodule RebayApiWeb.Router do
 
   scope "/api", RebayApiWeb do
     pipe_through :api
-    get "/items", ItemsController, :index
+    resources "/items", ItemController, except: [:new, :edit]
   end
 end
