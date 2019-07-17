@@ -13,5 +13,14 @@ defmodule RebayApi.Repo.Migrations.CreateItems do
       timestamps()
     end
 
+    alter table(:items) do
+      modify :title, :text
+      modify :description, :text
+      modify :image, :text
+    end
+  end
+
+  def down do
+    drop_if_exists table("items")
   end
 end
