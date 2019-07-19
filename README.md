@@ -18,3 +18,21 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
+
+## Deployment
+Environmental Variables ($HEROKU_API_KEY and $HEROKU_APP_NAME) for Deployment are stored in CircleCI.
+
+### Generate a new API Token
+`heroku authorizations:create`
+
+###$ [Setting an Environment Variable in a CircleCI Project](https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project)
+In the CircleCI application, go to your project’s settings by clicking the gear icon next to your project.
+
+In the Build Settings section, click on Environment Variables.
+
+Import variables from another project by clicking the Import Variable(s) button. Add new variables by clicking the Add Variable button. (Note: The Import Variables(s) button is not currently available on CircleCI installed in your private cloud or datacenter.)
+
+Use your new environment variables in your .circleci/config.yml file. For an example, see the Heroku deploy walkthrough.
+
+Once created, environment variables are hidden and uneditable in the application. Changing an environment variable is only possible by deleting and recreating it.
+
