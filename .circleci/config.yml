@@ -57,7 +57,7 @@ jobs:  # basic units of work in a run
           # Read more: https://circleci.com/docs/2.0/collect-test-data/
           path: _build/test/lib/rebay_api # Replace with the name of your :app
      
-deploy:
+  deploy:
     docker:
       - image: buildpack-deps:trusty
     steps:
