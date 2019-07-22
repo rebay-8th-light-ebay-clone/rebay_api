@@ -23,7 +23,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 `mix ecto.migrate`
 `mix run priv/repo/seeds.exs`
 
-# When changing the schema + migration files
+# When changing the schema or migration files, run:
 ```
 mix ecto.rollback
 mix ecto.migrate

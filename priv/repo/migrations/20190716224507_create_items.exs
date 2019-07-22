@@ -6,7 +6,7 @@ defmodule RebayApi.Repo.Migrations.CreateItems do
       add :title, :string
       add :description, :string
       add :image, :string
-      add :price, :float
+      add :price, :integer
       add :category, :string
       add :end_date, :utc_datetime
 

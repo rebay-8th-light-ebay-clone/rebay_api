@@ -9,7 +9,7 @@ defmodule RebayApiWeb.ItemControllerTest do
     description: "some description",
     end_date: "2010-04-17T14:00:00Z",
     image: "some image",
-    price: 120.5,
+    price: 1205,
     title: "some title"
   }
   @update_attrs %{
@@ -17,7 +17,7 @@ defmodule RebayApiWeb.ItemControllerTest do
     description: "some updated description",
     end_date: "2011-05-18T15:01:01Z",
     image: "some updated image",
-    price: 456.7,
+    price: 4567,
     title: "some updated title"
   }
   @invalid_attrs %{category: nil, description: nil, end_date: nil, image: nil, price: nil, title: nil}
@@ -51,7 +51,7 @@ defmodule RebayApiWeb.ItemControllerTest do
                "description" => "some description",
                "end_date" => "2010-04-17T14:00:00Z",
                "image" => "some image",
-               "price" => 120.5,
+               "price" => 1205,
                "title" => "some title"
              } = json_response(conn, 200)["data"]
     end
@@ -77,7 +77,7 @@ defmodule RebayApiWeb.ItemControllerTest do
                "description" => "some updated description",
                "end_date" => "2011-05-18T15:01:01Z",
                "image" => "some updated image",
-               "price" => 456.7,
+               "price" => 4567,
                "title" => "some updated title"
              } = json_response(conn, 200)["data"]
     end

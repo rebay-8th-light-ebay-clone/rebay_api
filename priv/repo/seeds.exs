@@ -43,7 +43,7 @@ Repo.insert!(
     ",
     end_date: date,
     image: "https://d3o372dlsg9lxo.cloudfront.net/catalog/products/d1525/images/enlarge/595fccf0bbddbd3afbd7d8f0/D1525_170511_106_D1525.jpg",
-    price: 75.00,
+    price: 7500,
     category: "Home & Garden"
 })
 
@@ -54,7 +54,7 @@ Repo.insert!(
     ",
     end_date: date,
     image: "https://i.ebayimg.com/images/g/ma8AAOSw4ZVcUzaV/s-l300.jpg",
-    price: 40.00,
+    price: 4000,
     category: "Electronics"
 })
 
@@ -65,6 +65,6 @@ Repo.insert!(
     ",
     end_date: date,
     image: "https://i.ebayimg.com/images/g/zdEAAOSwAetdLkzO/s-l1600.jpg",
-    price: 60.00,
+    price: 6000,
     category: "Fashion"
 })

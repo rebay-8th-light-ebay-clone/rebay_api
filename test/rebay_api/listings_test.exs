@@ -6,8 +6,8 @@ defmodule RebayApi.ListingsTest do
   describe "items" do
     alias RebayApi.Listings.Item
 
-    @valid_attrs %{category: "some category", description: "some description", end_date: "2010-04-17T14:00:00Z", image: "some image", price: 120.5, title: "some title"}
-    @update_attrs %{category: "some updated category", description: "some updated description", end_date: "2011-05-18T15:01:01Z", image: "some updated image", price: 456.7, title: "some updated title"}
+    @valid_attrs %{category: "some category", description: "some description", end_date: "2010-04-17T14:00:00Z", image: "some image", price: 1205, title: "some title"}
+    @update_attrs %{category: "some updated category", description: "some updated description", end_date: "2011-05-18T15:01:01Z", image: "some updated image", price: 4567, title: "some updated title"}
     @invalid_attrs %{category: nil, description: nil, end_date: nil, image: nil, price: nil, title: nil}
 
     def item_fixture(attrs \\ %{}) do
@@ -35,7 +35,7 @@ defmodule RebayApi.ListingsTest do
       assert item.description == "some description"
       assert item.end_date == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
       assert item.image == "some image"
-      assert item.price == 120.5
+      assert item.price == 1205
       assert item.title == "some title"
     end
 
@@ -50,7 +50,7 @@ defmodule RebayApi.ListingsTest do
       assert item.description == "some updated description"
       assert item.end_date == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
       assert item.image == "some updated image"
-      assert item.price == 456.7
+      assert item.price == 4567
       assert item.title == "some updated title"
     end
 

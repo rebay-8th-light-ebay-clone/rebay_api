@@ -7,7 +7,7 @@ defmodule RebayApi.Listings.Item do
     field :description, :string
     field :end_date, :utc_datetime
     field :image, :string
-    field :price, :float
+    field :price, :integer
     field :title, :string
 
     timestamps()
