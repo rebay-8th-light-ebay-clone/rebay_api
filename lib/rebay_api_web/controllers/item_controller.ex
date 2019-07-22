@@ -12,12 +12,12 @@ defmodule RebayApiWeb.ItemController do
   end
 
   def create(conn, %{"item" => item_params}) do
-    with {:ok, %Item{} = item} <- Listings.create_item(item_params) do
-      conn
-      |> put_status(:created)
-      |> put_resp_header("location", Routes.item_path(conn, :show, item))
-      |> render("show.json", item: item)
-    end
+      with {:ok, %Item{} = item} <- Listings.create_item(item_params) do
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", Routes.item_path(conn, :show, item))
+        |> render("show.json", item: item)
+      end
   end
 
   def show(conn, %{"id" => id}) do

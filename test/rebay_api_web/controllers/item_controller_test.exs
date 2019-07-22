@@ -3,6 +3,7 @@ defmodule RebayApiWeb.ItemControllerTest do
 
   alias RebayApi.Listings
   alias RebayApi.Listings.Item
+  alias RebayApi.TestHelpers
 
   @create_attrs %{
     category: "some category",
@@ -40,7 +41,11 @@ defmodule RebayApiWeb.ItemControllerTest do
 
   describe "create item" do
     test "renders item when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.item_path(conn, :create), item: @create_attrs)
+      user = TestHelpers.user_fixture()
+      conn = conn
+      |> assign(:user, user)
+      |> post(Routes.item_path(conn, :create), item: @create_attrs)
+
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, Routes.item_path(conn, :show, id))
