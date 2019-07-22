@@ -12,6 +12,7 @@
 
 alias RebayApi.Repo
 alias RebayApi.Listings.Item
+alias RebayApi.Accounts.User
 
 date = DateTime.utc_now() |> DateTime.truncate(:second)
 
@@ -68,3 +69,13 @@ Repo.insert!(
     price: 6000,
     category: "Fashion"
 })
+
+Repo.insert!(
+  %User{
+    avatar: "image-url.foo",
+    email: "travis@foo.fake",
+    first_name: "Travis",
+    provider: "google",
+    uuid: Ecto.UUID.generate(),
+  }
+)
