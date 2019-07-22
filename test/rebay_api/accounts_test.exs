@@ -6,9 +6,15 @@ defmodule RebayApi.AccountsTest do
   describe "users" do
     alias RebayApi.Accounts.User
 
+<<<<<<< HEAD
     @valid_attrs %{avatar: "some avatar", email: "some email", first_name: "some first_name", provider: "some provider", uuid: "7488a646-e31f-11e4-aace-600308960662"}
     @update_attrs %{avatar: "some updated avatar", email: "some updated email", first_name: "some updated first_name", provider: "some updated provider", uuid: "7488a646-e31f-11e4-aace-600308960668"}
     @invalid_attrs %{avatar: nil, email: nil, first_name: nil, provider: nil, uuid: nil}
+=======
+    @valid_attrs %{avatar: "some avatar", email: "some email", first_name: "some first_name", provider: "some provider", token: "some token", uuid: "7488a646-e31f-11e4-aace-600308960662"}
+    @update_attrs %{avatar: "some updated avatar", email: "some updated email", first_name: "some updated first_name", provider: "some updated provider", token: "some updated token", uuid: "7488a646-e31f-11e4-aace-600308960668"}
+    @invalid_attrs %{avatar: nil, email: nil, first_name: nil, provider: nil, token: nil, uuid: nil}
+>>>>>>> Setup Google OAuth with ueberauth
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
@@ -26,7 +32,11 @@ defmodule RebayApi.AccountsTest do
 
     test "get_user!/1 returns the user with given id" do
       user = user_fixture()
+<<<<<<< HEAD
       assert Accounts.get_user!(user.uuid) == user
+=======
+      assert Accounts.get_user!(user.id) == user
+>>>>>>> Setup Google OAuth with ueberauth
     end
 
     test "create_user/1 with valid data creates a user" do
@@ -35,6 +45,10 @@ defmodule RebayApi.AccountsTest do
       assert user.email == "some email"
       assert user.first_name == "some first_name"
       assert user.provider == "some provider"
+<<<<<<< HEAD
+=======
+      assert user.token == "some token"
+>>>>>>> Setup Google OAuth with ueberauth
       assert user.uuid == "7488a646-e31f-11e4-aace-600308960662"
     end
 
@@ -49,6 +63,10 @@ defmodule RebayApi.AccountsTest do
       assert user.email == "some updated email"
       assert user.first_name == "some updated first_name"
       assert user.provider == "some updated provider"
+<<<<<<< HEAD
+=======
+      assert user.token == "some updated token"
+>>>>>>> Setup Google OAuth with ueberauth
       assert user.uuid == "7488a646-e31f-11e4-aace-600308960668"
     end
 
