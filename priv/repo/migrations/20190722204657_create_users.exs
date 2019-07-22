@@ -12,6 +12,9 @@ defmodule RebayApi.Repo.Migrations.CreateUsers do
 
       timestamps()
     end
+  end
 
+  def down do
+    drop_if_exists table(:users)
   end
 end
