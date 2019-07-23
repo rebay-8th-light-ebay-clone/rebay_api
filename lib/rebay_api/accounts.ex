@@ -35,7 +35,7 @@ defmodule RebayApi.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(uuid), do: Repo.get_by!(User, uuid: uuid)
 
   @doc """
   Creates a user.

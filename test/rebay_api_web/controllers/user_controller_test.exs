@@ -18,7 +18,7 @@ defmodule RebayApiWeb.UserControllerTest do
     first_name: "some updated first_name",
     provider: "some updated provider",
     token: "some updated token",
-    uuid: "7488a646-e31f-11e4-aace-600308960668"
+    uuid: "7488a646-e31f-11e4-aace-600308960662"
   }
   @invalid_attrs %{avatar: nil, email: nil, first_name: nil, provider: nil, token: nil, uuid: nil}
 
@@ -41,9 +41,9 @@ defmodule RebayApiWeb.UserControllerTest do
   describe "create user" do
     test "renders user when data is valid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
 
-      conn = get(conn, Routes.user_path(conn, :show, id))
+      conn = get(conn, Routes.user_path(conn, :show, uuid))
 
       assert %{
                "id" => id,
@@ -64,12 +64,13 @@ defmodule RebayApiWeb.UserControllerTest do
 
   describe "update user" do
     setup [:create_user]
+    test "renders user when data is valid", %{conn: conn, user: user} do
+      uuid = user.uuid
+      conn = put(conn, Routes.user_path(conn, :update, uuid), user: @update_attrs)
 
-    test "renders user when data is valid", %{conn: conn, user: %User{id: id} = user} do
-      conn = put(conn, Routes.user_path(conn, :update, user), user: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      assert %{"uuid" => ^uuid} = json_response(conn, 200)["data"]
 
-      conn = get(conn, Routes.user_path(conn, :show, id))
+      conn = get(conn, Routes.user_path(conn, :show, uuid))
 
       assert %{
                "id" => id,
@@ -78,12 +79,12 @@ defmodule RebayApiWeb.UserControllerTest do
                "first_name" => "some updated first_name",
                "provider" => "some updated provider",
                "token" => "some updated token",
-               "uuid" => "7488a646-e31f-11e4-aace-600308960668"
-             } = json_response(conn, 200)["data"]
+               "uuid" => "7488a646-e31f-11e4-aace-600308960662"
+              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn, user: user} do
-      conn = put(conn, Routes.user_path(conn, :update, user), user: @invalid_attrs)
+      conn = put(conn, Routes.user_path(conn, :update, user.uuid), user: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -92,11 +93,11 @@ defmodule RebayApiWeb.UserControllerTest do
     setup [:create_user]
 
     test "deletes chosen user", %{conn: conn, user: user} do
-      conn = delete(conn, Routes.user_path(conn, :delete, user))
+      conn = delete(conn, Routes.user_path(conn, :delete, user.uuid))
       assert response(conn, 204)
 
       assert_error_sent 404, fn ->
-        get(conn, Routes.user_path(conn, :show, user))
+        get(conn, Routes.user_path(conn, :show, user.uuid))
       end
     end
   end
