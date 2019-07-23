@@ -21,13 +21,13 @@ defmodule RebayApiWeb.AuthController do
     {:ok, user} = insert_or_update_user(changeset)
     conn
     |> put_session(:user_id, user.uuid)
-    |> redirect(to: UserController.show(conn, %{"id" => user.id}))
+    |> redirect(to: user_path(conn, :show, :user)))
   end
 
   def signout(conn, _params) do
     conn
     |> configure_session(drop: true)
-    |> redirect(to: developer_path(conn, :index))
+    #TODO: configure signout response
   end
 
   defp insert_or_update_user(changeset) do
