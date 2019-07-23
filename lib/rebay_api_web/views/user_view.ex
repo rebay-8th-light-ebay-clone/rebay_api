@@ -11,8 +11,7 @@ defmodule RebayApiWeb.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id,
-      email: user.email,
+    %{email: user.email,
       provider: user.provider,
       token: user.token,
       avatar: user.avatar,

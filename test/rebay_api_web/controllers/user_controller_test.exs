@@ -45,7 +45,6 @@ defmodule RebayApiWeb.UserControllerTest do
       conn = get(conn, Routes.user_path(conn, :show, uuid))
 
       assert %{
-               "id" => id,
                "avatar" => "some avatar",
                "email" => "some email",
                "first_name" => "some first_name",
@@ -72,7 +71,6 @@ defmodule RebayApiWeb.UserControllerTest do
       conn = get(conn, Routes.user_path(conn, :show, uuid))
 
       assert %{
-               "id" => id,
                "avatar" => "some updated avatar",
                "email" => "some updated email",
                "first_name" => "some updated first_name",
