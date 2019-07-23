@@ -41,8 +41,9 @@ defmodule RebayApi.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:ueberauth, "~> 0.3"},
-      {:ueberauth_google, "~> 0.7"}
+      {:ueberauth, "~> 0.5"},
+      {:ueberauth_google, "~> 0.7"},
+      {:poison, "~> 3.1"}
     ]
   end
 

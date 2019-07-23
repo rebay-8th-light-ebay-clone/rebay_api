@@ -1,16 +1,16 @@
 defmodule RebayApiWeb.Router do
   use RebayApiWeb, :router
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
   pipeline :auth do
     plug :accepts, ["json"]
     plug :fetch_session
+    plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug RebayApiWeb.Plugs.SetUser
+  end
+
+  pipeline :api do
+    plug :accepts, ["json"]
   end
 
   scope "/api", RebayApiWeb do
@@ -19,9 +19,11 @@ defmodule RebayApiWeb.Router do
     resources "/users", UserController, except: [:new, :edit], param: "uuid"
   end
 
-  scope "/auth", RebayAPIWeb do
+  scope "/auth", RebayApiWeb do
     pipe_through :auth
-    get "/:provider", AuthController, :request
-    get "/:provider/callback", AuthController, :callback
+
+    get "/:provider", SessionController, :request
+    get "/:provider/callback", SessionController, :create
   end
+
 end

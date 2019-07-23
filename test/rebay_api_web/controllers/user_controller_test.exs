@@ -2,7 +2,6 @@ defmodule RebayApiWeb.UserControllerTest do
   use RebayApiWeb.ConnCase
 
   alias RebayApi.Accounts
-  alias RebayApi.Accounts.User
 
   @create_attrs %{
     avatar: "some avatar",
