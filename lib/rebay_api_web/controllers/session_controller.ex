@@ -5,6 +5,22 @@ defmodule RebayApiWeb.SessionController do
   alias RebayApi.Repo
   alias RebayApi.Accounts.User
 
+  def options(conn, _params) do
+    conn
+    |> put_resp_header("access-control-allow-origin", "http://localhost:3000")
+    |> put_resp_header("access-control-allow-methods", "GET OPTIONS")
+    |> put_status(204)
+    |> text("OK")
+  end
+
+  def request(conn, _params) do
+    conn
+    |> put_resp_header("access-control-allow-origin", "http://localhost:3000")
+    |> put_resp_header("access-control-allow-methods", "GET OPTIONS")
+    |> put_status(204)
+    |> render
+  end
+
   def create(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     user_params = %{
       avatar: auth.info.image,
@@ -12,7 +28,7 @@ defmodule RebayApiWeb.SessionController do
       first_name: auth.info.first_name,
       provider: "google",
       token: auth.credentials.token,
-      uuid: Ecto.UUID.generate() 
+      uuid: Ecto.UUID.generate()
     }
 
     changeset = User.changeset(%User{}, user_params)
@@ -22,7 +38,7 @@ defmodule RebayApiWeb.SessionController do
         conn
         |> put_session(:user_id, user.id)
         |> redirect(to: Routes.user_path(conn, :show, user.uuid))
-      {:error, %Ecto.Changeset{} = changeset} -> 
+      {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_view(RebayApiWeb.ChangesetView)
         |> render("error.json", changeset: changeset)
@@ -31,7 +47,7 @@ defmodule RebayApiWeb.SessionController do
 
   defp insert_or_update_user(changeset) do
     case Repo.get_by(User, email: changeset.changes.email) do
-      nil -> 
+      nil ->
         Repo.insert(changeset)
       user ->
         {:ok, user}

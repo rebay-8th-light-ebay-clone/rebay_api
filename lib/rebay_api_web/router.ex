@@ -22,6 +22,7 @@ defmodule RebayApiWeb.Router do
   scope "/auth", RebayApiWeb do
     pipe_through :auth
 
+    options "/:provider", SessionController, :options
     get "/:provider", SessionController, :request
     get "/:provider/callback", SessionController, :create
   end
