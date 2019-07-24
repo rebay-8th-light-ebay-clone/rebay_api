@@ -19,6 +19,17 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
 
+# Seeding Postgres Data
+`mix ecto.migrate`
+`mix run priv/repo/seeds.exs`
+
+# When changing the schema or migration files, run:
+```
+mix ecto.rollback
+mix ecto.migrate
+mix run priv/repo/seeds.exs
+```
+
 ## Deployment
 Environmental Variables ($HEROKU_API_KEY and $HEROKU_APP_NAME) for Deployment are stored in CircleCI.
 
