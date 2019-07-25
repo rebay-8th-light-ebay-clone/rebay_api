@@ -16,7 +16,8 @@ defmodule RebayApiWeb.Router do
 
   scope "/api", RebayApiWeb do
     pipe_through :api
-    resources "/items", ItemController, except: [:new, :edit]
+    resources "/items", ItemController, only: [:index]
+    resources "/users/:user_uuid/items", ItemController, except: [:new, :edit], param: "uuid", as: "user_item"
     resources "/users", UserController, except: [:new, :edit], param: "uuid"
   end
 
@@ -27,5 +28,4 @@ defmodule RebayApiWeb.Router do
     get "/:provider", SessionController, :request
     get "/:provider/callback", SessionController, :create
   end
-
 end
