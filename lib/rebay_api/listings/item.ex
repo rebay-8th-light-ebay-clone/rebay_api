@@ -2,6 +2,8 @@ defmodule RebayApi.Listings.Item do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias RebayApi.Accounts.User
+
   schema "items" do
     field :category, :string
     field :description, :string
@@ -10,6 +12,7 @@ defmodule RebayApi.Listings.Item do
     field :price, :integer
     field :title, :string
     field :uuid, Ecto.UUID
+    belongs_to :user, User
 
     timestamps()
   end

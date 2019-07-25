@@ -46,17 +46,6 @@ defmodule RebayApiWeb.SessionControllerTest do
     assert conn.assigns[:user] == nil
   end
 
-  test "signs out user", %{conn: conn} do
-    user = TestHelpers.user_fixture()
-
-    conn = conn
-    |> assign(:user, user)
-    |> get("/auth/signout")
-    |> get("/api/items")
-
-    assert conn.assigns[:user] == nil
-  end
-
   test "handles errors", %{conn: conn} do
     ueberauth_auth = %{
       credentials: %{token: "fdsnoafhnoofh08h38h"},

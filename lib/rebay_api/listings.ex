@@ -8,7 +8,7 @@ defmodule RebayApi.Listings do
     Repo.all(Item)
   end
 
-  def get_item!(id), do: Repo.get!(Item, id)
+  def get_item!(uuid), do: Repo.get_by!(Item, uuid: uuid)
 
   def create_item(attrs \\ %{}) do
     %Item{}
