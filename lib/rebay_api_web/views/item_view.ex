@@ -1,6 +1,7 @@
 defmodule RebayApiWeb.ItemView do
   use RebayApiWeb, :view
   alias RebayApiWeb.ItemView
+  alias RebayApi.Repo
 
   def render("index.json", %{items: items}) do
     %{data: render_many(items, ItemView, "item.json")}
@@ -17,6 +18,6 @@ defmodule RebayApiWeb.ItemView do
       price: item.price,
       category: item.category,
       end_date: item.end_date,
-      uuid: item.uuid}
+      uuid: item.uuid,}
   end
 end

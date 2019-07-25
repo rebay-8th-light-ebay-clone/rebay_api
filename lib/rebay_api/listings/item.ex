@@ -20,7 +20,7 @@ defmodule RebayApi.Listings.Item do
   @doc false
   def changeset(item, attrs) do
     item
-    |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid])
+    |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid, :user_id])
     |> validate_required([:title, :description, :image, :price, :category, :end_date, :uuid])
   end
 end

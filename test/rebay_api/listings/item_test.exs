@@ -1,7 +1,6 @@
 defmodule RebayApi.ItemTest do
   use RebayApi.DataCase
 
-  alias RebayApi.Accounts.User
   alias RebayApi.Listings.Item
   alias RebayApi.TestHelpers
 
@@ -22,7 +21,7 @@ defmodule RebayApi.ItemTest do
     {:ok, item: item}
   end
 
-  test "has many items", context do
+  test "belongs to a user", context do
     item = Item
     |> Repo.get(context[:item].id)
     |> Repo.preload(:user)

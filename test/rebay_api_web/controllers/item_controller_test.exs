@@ -4,6 +4,7 @@ defmodule RebayApiWeb.ItemControllerTest do
   alias RebayApi.Listings
   alias RebayApi.Listings.Item
   alias RebayApi.TestHelpers
+  alias RebayApi.Repo
 
   @uuid Ecto.UUID.generate()
   @create_attrs %{
@@ -78,6 +79,21 @@ defmodule RebayApiWeb.ItemControllerTest do
                "title" => "some title",
                "uuid" => uuid,
              } = json_response(conn, 200)["data"]
+    end
+    
+    test "associates the item with the correct user", %{conn: conn} do
+      user = TestHelpers.user_fixture()
+      conn = conn
+      |> assign(:user, user)
+      |> post(Routes.user_item_path(conn, :create, user.uuid), item: @create_attrs)
+
+      assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
+
+      item = Item
+      |> Repo.get_by!(uuid: uuid)
+      |> Repo.preload(:user)
+
+      assert item.user == user
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
