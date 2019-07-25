@@ -5,13 +5,15 @@ defmodule RebayApiWeb.ItemControllerTest do
   alias RebayApi.Listings.Item
   alias RebayApi.TestHelpers
 
+  @uuid Ecto.UUID.generate()
   @create_attrs %{
     category: "some category",
     description: "some description",
     end_date: "2010-04-17T14:00:00Z",
     image: "some image",
     price: 1205,
-    title: "some title"
+    title: "some title",
+    uuid: @uuid
   }
   @update_attrs %{
     category: "some updated category",
@@ -39,30 +41,48 @@ defmodule RebayApiWeb.ItemControllerTest do
     end
   end
 
+  describe "show" do
+    setup [:create_item]
+    test "lists one item", %{conn: conn, item: item} do
+      user = TestHelpers.user_fixture()
+      conn = get(conn, Routes.user_item_path(conn, :show, user.uuid, item.uuid))
+      assert json_response(conn, 200)["data"] == %{
+        "category" => "some category",
+        "description" => "some description",
+        "end_date" => "2010-04-17T14:00:00Z",
+        "image" => "some image",
+        "price" => 1205,
+        "title" => "some title",
+        "uuid" => @uuid
+      }
+    end
+  end
+
   describe "create item" do
     test "renders item when data is valid", %{conn: conn} do
       user = TestHelpers.user_fixture()
       conn = conn
       |> assign(:user, user)
-      |> post(Routes.item_path(conn, :create), item: @create_attrs)
+      |> post(Routes.user_item_path(conn, :create, user.uuid), item: @create_attrs)
 
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
 
-      conn = get(conn, Routes.item_path(conn, :show, id))
+      conn = get(conn, Routes.user_item_path(conn, :show, user.uuid, uuid))
 
       assert %{
-               "id" => id,
                "category" => "some category",
                "description" => "some description",
                "end_date" => "2010-04-17T14:00:00Z",
                "image" => "some image",
                "price" => 1205,
-               "title" => "some title"
+               "title" => "some title",
+               "uuid" => uuid,
              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.item_path(conn, :create), item: @invalid_attrs)
+      user = TestHelpers.user_fixture()
+      conn = post(conn, Routes.user_item_path(conn, :create, user.uuid), item: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -70,25 +90,27 @@ defmodule RebayApiWeb.ItemControllerTest do
   describe "update item" do
     setup [:create_item]
 
-    test "renders item when data is valid", %{conn: conn, item: %Item{id: id} = item} do
-      conn = put(conn, Routes.item_path(conn, :update, item), item: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+    test "renders item when data is valid", %{conn: conn, item: %Item{uuid: uuid} = item} do
+      user = TestHelpers.user_fixture()
+      conn = put(conn, Routes.user_item_path(conn, :update, user.uuid, item.uuid), item: @update_attrs)
+      assert %{"uuid" => ^uuid} = json_response(conn, 200)["data"]
 
-      conn = get(conn, Routes.item_path(conn, :show, id))
+      conn = get(conn, Routes.user_item_path(conn, :show, user.uuid, item.uuid))
 
       assert %{
-               "id" => id,
                "category" => "some updated category",
                "description" => "some updated description",
                "end_date" => "2011-05-18T15:01:01Z",
                "image" => "some updated image",
                "price" => 4567,
-               "title" => "some updated title"
+               "title" => "some updated title",
+               "uuid" => uuid,
              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn, item: item} do
-      conn = put(conn, Routes.item_path(conn, :update, item), item: @invalid_attrs)
+      user = TestHelpers.user_fixture()
+      conn = put(conn, Routes.user_item_path(conn, :update, user.uuid, item.uuid), item: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -97,11 +119,12 @@ defmodule RebayApiWeb.ItemControllerTest do
     setup [:create_item]
 
     test "deletes chosen item", %{conn: conn, item: item} do
-      conn = delete(conn, Routes.item_path(conn, :delete, item))
+      user = TestHelpers.user_fixture()
+      conn = delete(conn, Routes.user_item_path(conn, :delete, user.uuid, item.uuid))
       assert response(conn, 204)
 
       assert_error_sent 404, fn ->
-        get(conn, Routes.item_path(conn, :show, item))
+        get(conn, Routes.user_item_path(conn, :show, user.uuid, item.uuid))
       end
     end
   end

@@ -6,7 +6,7 @@ defmodule RebayApi.ListingsTest do
   describe "items" do
     alias RebayApi.Listings.Item
 
-    @valid_attrs %{category: "some category", description: "some description", end_date: "2010-04-17T14:00:00Z", image: "some image", price: 1205, title: "some title"}
+    @valid_attrs %{category: "some category", description: "some description", end_date: "2010-04-17T14:00:00Z", image: "some image", price: 1205, title: "some title", uuid: Ecto.UUID.generate()}
     @update_attrs %{category: "some updated category", description: "some updated description", end_date: "2011-05-18T15:01:01Z", image: "some updated image", price: 4567, title: "some updated title"}
     @invalid_attrs %{category: nil, description: nil, end_date: nil, image: nil, price: nil, title: nil}
 
@@ -26,7 +26,7 @@ defmodule RebayApi.ListingsTest do
 
     test "get_item!/1 returns the item with given id" do
       item = item_fixture()
-      assert Listings.get_item!(item.id) == item
+      assert Listings.get_item!(item.uuid) == item
     end
 
     test "create_item/1 with valid data creates a item" do
@@ -57,13 +57,13 @@ defmodule RebayApi.ListingsTest do
     test "update_item/2 with invalid data returns error changeset" do
       item = item_fixture()
       assert {:error, %Ecto.Changeset{}} = Listings.update_item(item, @invalid_attrs)
-      assert item == Listings.get_item!(item.id)
+      assert item == Listings.get_item!(item.uuid)
     end
 
     test "delete_item/1 deletes the item" do
       item = item_fixture()
       assert {:ok, %Item{}} = Listings.delete_item(item)
-      assert_raise Ecto.NoResultsError, fn -> Listings.get_item!(item.id) end
+      assert_raise Ecto.NoResultsError, fn -> Listings.get_item!(item.uuid) end
     end
 
     test "change_item/1 returns a item changeset" do

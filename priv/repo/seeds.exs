@@ -45,7 +45,8 @@ Repo.insert!(
     end_date: date,
     image: "https://d3o372dlsg9lxo.cloudfront.net/catalog/products/d1525/images/enlarge/595fccf0bbddbd3afbd7d8f0/D1525_170511_106_D1525.jpg",
     price: 7500,
-    category: "Home & Garden"
+    category: "Home & Garden",
+    uuid: Ecto.UUID.generate(),
 })
 
 Repo.insert!(
@@ -56,7 +57,8 @@ Repo.insert!(
     end_date: date,
     image: "https://i.ebayimg.com/images/g/ma8AAOSw4ZVcUzaV/s-l300.jpg",
     price: 4000,
-    category: "Electronics"
+    category: "Electronics",
+    uuid: Ecto.UUID.generate(),
 })
 
 Repo.insert!(
@@ -67,7 +69,8 @@ Repo.insert!(
     end_date: date,
     image: "https://i.ebayimg.com/images/g/zdEAAOSwAetdLkzO/s-l1600.jpg",
     price: 6000,
-    category: "Fashion"
+    category: "Fashion",
+    uuid: Ecto.UUID.generate(),
 })
 
 Repo.insert!(

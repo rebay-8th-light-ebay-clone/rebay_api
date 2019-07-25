@@ -9,6 +9,7 @@ defmodule RebayApi.Listings.Item do
     field :image, :string
     field :price, :integer
     field :title, :string
+    field :uuid, Ecto.UUID
 
     timestamps()
   end
@@ -16,7 +17,7 @@ defmodule RebayApi.Listings.Item do
   @doc false
   def changeset(item, attrs) do
     item
-    |> cast(attrs, [:title, :description, :image, :price, :category, :end_date])
-    |> validate_required([:title, :description, :image, :price, :category, :end_date])
+    |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid])
+    |> validate_required([:title, :description, :image, :price, :category, :end_date, :uuid])
   end
 end

@@ -11,12 +11,12 @@ defmodule RebayApiWeb.ItemView do
   end
 
   def render("item.json", %{item: item}) do
-    %{id: item.id,
-      title: item.title,
+    %{title: item.title,
       description: item.description,
       image: item.image,
       price: item.price,
       category: item.category,
-      end_date: item.end_date}
+      end_date: item.end_date,
+      uuid: item.uuid}
   end
 end
