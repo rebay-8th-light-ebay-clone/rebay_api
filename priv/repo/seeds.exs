@@ -16,6 +16,18 @@ alias RebayApi.Accounts.User
 
 date = DateTime.utc_now() |> DateTime.truncate(:second)
 
+user = %User{
+  avatar: "image-url.foo",
+  email: "travis@foo.fake",
+  first_name: "Travis",
+  provider: "google",
+  uuid: Ecto.UUID.generate(),
+}
+Repo.insert!(user)
+
+user = Repo.get_by(User, uuid: user.uuid)
+
+
 Repo.insert!(
   %Item{
     title: "42 inch Large PU Leather Ottoman Bench Storage Chest Footstool White",
@@ -47,6 +59,7 @@ Repo.insert!(
     price: 7500,
     category: "Home & Garden",
     uuid: Ecto.UUID.generate(),
+    user_id: user.id
 })
 
 Repo.insert!(
@@ -59,7 +72,9 @@ Repo.insert!(
     price: 4000,
     category: "Electronics",
     uuid: Ecto.UUID.generate(),
+    user_id: user.id
 })
+
 
 Repo.insert!(
   %Item{
@@ -71,14 +86,5 @@ Repo.insert!(
     price: 6000,
     category: "Fashion",
     uuid: Ecto.UUID.generate(),
+    user_id: user.id,
 })
-
-Repo.insert!(
-  %User{
-    avatar: "image-url.foo",
-    email: "travis@foo.fake",
-    first_name: "Travis",
-    provider: "google",
-    uuid: Ecto.UUID.generate(),
-  }
-)
