@@ -31,7 +31,7 @@ defmodule RebayApiWeb.SessionControllerTest do
     users = User |> Repo.all
     [ user | _ ] = users
     assert Enum.count(users) == 1
-    assert get_resp_header(conn, "location") == ["http://localhost:3000/login/#{user.uuid}"]
+    assert get_resp_header(conn, "location") == ["#{System.get_env("CLIENT_HOST")}/login/#{user.uuid}"]
     assert fetch_cookies(conn).cookies["session_id"] == "fdsnoafhnoofh08h38h"
   end
 
