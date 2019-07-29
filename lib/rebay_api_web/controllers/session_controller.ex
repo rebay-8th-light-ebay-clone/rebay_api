@@ -14,7 +14,7 @@ defmodule RebayApiWeb.SessionController do
         conn
         |> put_session(:id, auth.credentials.token)
         |> put_session(:user_uuid, user.uuid)
-        |> put_resp_cookie("session_id", auth.credentials.token, [http_only: true])
+        |> put_resp_cookie("session_id", auth.credentials.token, [http_only: true, secure: false])
         |> redirect(external: "#{System.get_env("CLIENT_HOST")}/login/#{user.uuid}")
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
@@ -22,7 +22,7 @@ defmodule RebayApiWeb.SessionController do
         |> render("error.json", changeset: changeset)
     end
   end
-  
+
   def delete(conn, _params) do
     conn
     |> configure_session(drop: true)
@@ -41,7 +41,7 @@ defmodule RebayApiWeb.SessionController do
 
   defp insert_or_update_user(changeset) do
     case Repo.get_by(User, uuid: changeset.changes.uuid) do
-      nil -> 
+      nil ->
         Repo.insert(changeset)
       user ->
         {:ok, user}

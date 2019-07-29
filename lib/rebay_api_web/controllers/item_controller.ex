@@ -6,7 +6,7 @@ defmodule RebayApiWeb.ItemController do
   alias RebayApi.Listings.Item
 
   action_fallback RebayApiWeb.FallbackController
-  
+
   plug :authenticate_session when action in [:create, :update, :delete]
   plug :authorize_user when action in [:create, :update, :delete]
 
@@ -15,9 +15,12 @@ defmodule RebayApiWeb.ItemController do
     render(conn, "index.json", items: items)
   end
 
-  def create(conn, %{"item" => item_params, "user_uuid" => user_uuid} = params) do
+  def create(conn, _params) do
+    user_uuid = conn.params["user_uuid"]
     user = Accounts.get_user!(user_uuid)
-    with {:ok, %Item{} = item} <- Listings.create_item(Map.put(item_params, "user_id", user.id)) do
+    create_attrs = Map.put(conn.params, "user_id", user.id) |> Map.put("uuid", Ecto.UUID.generate)
+
+    with {:ok, %Item{} = item} <- Listings.create_item(create_attrs) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.user_item_path(conn, :show, user_uuid, item))
@@ -47,22 +50,24 @@ defmodule RebayApiWeb.ItemController do
   end
 
   defp authenticate_session(conn, _) do
+    conn = fetch_cookies(conn, [:session_id])
+
     if conn.assigns[:user] do
       session_id = get_session(conn, :id)
     else
       session_id = nil
     end
 
-    session_cookie = conn.params["cookie"]["session_id"]
-    
+    session_cookie = conn.cookies["session_id"]
+
     case session_cookie do
-      nil -> 
+      nil ->
         conn
         |> put_status(:unauthorized)
         |> put_view(RebayApiWeb.ErrorView)
         |> render("401.json")
         |> halt()
-      session_id -> 
+      session_id ->
         conn
     end
   end
@@ -71,7 +76,7 @@ defmodule RebayApiWeb.ItemController do
     user_uuid_param = conn.params["user_uuid"]
     current_user = conn.assigns[:user]
 
-    if user_uuid_param == current_user.uuid do
+    if current_user != nil && user_uuid_param == current_user.uuid do
       conn
     else
       conn
