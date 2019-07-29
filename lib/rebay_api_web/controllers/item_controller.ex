@@ -6,13 +6,15 @@ defmodule RebayApiWeb.ItemController do
   alias RebayApi.Listings.Item
 
   action_fallback RebayApiWeb.FallbackController
+  
+  plug :authenticate_session when action in [:create, :update, :delete]
 
   def index(conn, _params) do
     items = Listings.list_items()
     render(conn, "index.json", items: items)
   end
 
-  def create(conn, %{"item" => item_params, "user_uuid" => user_uuid}) do
+  def create(conn, %{"item" => item_params, "user_uuid" => user_uuid} = params) do
     user = Accounts.get_user!(user_uuid)
     with {:ok, %Item{} = item} <- Listings.create_item(Map.put(item_params, "user_id", user.id)) do
       conn
@@ -40,6 +42,21 @@ defmodule RebayApiWeb.ItemController do
 
     with {:ok, %Item{}} <- Listings.delete_item(item) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  defp authenticate_session(conn, _) do
+    session_id = get_session(conn, :id)
+    session_cookie = conn.params["cookie"]["session_id"]
+    case session_cookie do
+      nil -> 
+        conn
+        |> put_status(:unauthorized)
+        |> put_view(RebayApiWeb.ErrorView)
+        |> render("401.json")
+        |> halt()
+      session_id -> 
+        conn
     end
   end
 end
