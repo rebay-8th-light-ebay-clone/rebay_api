@@ -8,7 +8,7 @@ defmodule RebayApiWeb.ItemController do
   action_fallback RebayApiWeb.FallbackController
 
   plug :authenticate_session when action in [:create, :update, :delete]
-  plug :authorize_user when action in [:create, :update, :delete]
+  # plug :authorize_user when action in [:create, :update, :delete]
 
   def index(conn, _params) do
     items = Listings.list_items()
@@ -18,7 +18,18 @@ defmodule RebayApiWeb.ItemController do
   def create(conn, _params) do
     user_uuid = conn.params["user_uuid"]
     user = Accounts.get_user!(user_uuid)
-    create_attrs = Map.put(conn.params, "user_id", user.id) |> Map.put("uuid", Ecto.UUID.generate)
+
+    end_date = case conn.params["end_date"] do
+      nil ->
+        nil
+      _ ->
+        {:ok, end_date, _ } = DateTime.from_iso8601(conn.params["end_date"])
+        DateTime.truncate(end_date, :second)
+    end
+
+    create_attrs = Map.put(conn.params, "user_id", user.id)
+    |> Map.put("uuid", Ecto.UUID.generate)
+    |> Map.put("end_date", end_date)
 
     with {:ok, %Item{} = item} <- Listings.create_item(create_attrs) do
       conn
@@ -51,14 +62,13 @@ defmodule RebayApiWeb.ItemController do
 
   defp authenticate_session(conn, _) do
     conn = fetch_cookies(conn, [:session_id])
-
-    if conn.assigns[:user] do
-      session_id = get_session(conn, :id)
-    else
-      session_id = nil
-    end
-
     session_cookie = conn.cookies["session_id"]
+
+    session_id = if conn.assigns[:user] do
+      get_session(conn, :id)
+    else
+      nil
+    end
 
     case session_cookie do
       nil ->
@@ -72,18 +82,18 @@ defmodule RebayApiWeb.ItemController do
     end
   end
 
-  defp authorize_user(conn, _) do
-    user_uuid_param = conn.params["user_uuid"]
-    current_user = conn.assigns[:user]
+  # defp authorize_user(conn, _) do
+  #   user_uuid_param = conn.params["user_uuid"]
+  #   current_user = conn.assigns[:user]
 
-    if current_user != nil && user_uuid_param == current_user.uuid do
-      conn
-    else
-      conn
-      |> put_status(:unauthorized)
-      |> put_view(RebayApiWeb.ErrorView)
-      |> render("401.json")
-      |> halt()
-    end
-  end
+  #   if current_user != nil && user_uuid_param == current_user.uuid do
+  #     conn
+  #   else
+  #     conn
+  #     |> put_status(:unauthorized)
+  #     |> put_view(RebayApiWeb.ErrorView)
+  #     |> render("401.json")
+  #     |> halt()
+  #   end
+  # end
 end

@@ -11,7 +11,7 @@ defmodule RebayApiWeb.ItemControllerTest do
   @create_attrs %{
     category: "some category",
     description: "some description",
-    end_date: "2010-04-17T14:00:00Z",
+    end_date: "2019-07-31T06:59:59.000Z",
     image: "some image",
     price: 1205,
     title: "some title",
@@ -51,7 +51,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert json_response(conn, 200)["data"] == %{
         "category" => "some category",
         "description" => "some description",
-        "end_date" => "2010-04-17T14:00:00Z",
+        "end_date" => "2019-07-31T06:59:59Z",
         "image" => "some image",
         "price" => 1205,
         "title" => "some title",
@@ -65,8 +65,8 @@ defmodule RebayApiWeb.ItemControllerTest do
     test "renders item when data is valid", %{conn: conn} do
       user = TestHelpers.user_fixture()
       conn = conn
-      |> init_test_session(id: "test_id_token")
       |> assign(:user, user)
+      |> init_test_session(id: "test_id_token")
       |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
       |> post(Routes.user_item_path(conn, :create, user.uuid), @create_attrs)
 
@@ -77,7 +77,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert %{
                "category" => "some category",
                "description" => "some description",
-               "end_date" => "2010-04-17T14:00:00Z",
+               "end_date" => "2019-07-31T06:59:59Z",
                "image" => "some image",
                "price" => 1205,
                "title" => "some title",
@@ -101,6 +101,7 @@ defmodule RebayApiWeb.ItemControllerTest do
 
       assert item.user == user
     end
+
 
     test "renders error when user is logged in but request is not authenticated", %{conn: conn} do
       user = TestHelpers.user_fixture()

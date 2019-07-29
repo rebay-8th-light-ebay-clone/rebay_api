@@ -14,7 +14,9 @@ alias RebayApi.Repo
 alias RebayApi.Listings.Item
 alias RebayApi.Accounts.User
 
-date = DateTime.utc_now() |> DateTime.truncate(:second)
+# date = DateTime.utc_now() |> DateTime.truncate(:second)
+{:ok, date, _} = DateTime.from_iso8601("2019-07-31T06:59:59.000Z")
+date = date |> DateTime.truncate(:second)
 
 user = %User{
   avatar: "image-url.foo",
