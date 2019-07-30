@@ -31,11 +31,11 @@ defmodule RebayApi.AccountsTest do
 
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-      assert user.avatar == "some avatar"
-      assert user.email == "some email"
-      assert user.first_name == "some first_name"
-      assert user.provider == "some provider"
-      assert user.uuid == "7488a646-e31f-11e4-aace-600308960662"
+      assert user.avatar == @valid_attrs.avatar
+      assert user.email == @valid_attrs.email
+      assert user.first_name == @valid_attrs.first_name
+      assert user.provider == @valid_attrs.provider
+      assert user.uuid == @valid_attrs.uuid
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -45,11 +45,11 @@ defmodule RebayApi.AccountsTest do
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
-      assert user.avatar == "some updated avatar"
-      assert user.email == "some updated email"
-      assert user.first_name == "some updated first_name"
-      assert user.provider == "some updated provider"
-      assert user.uuid == "7488a646-e31f-11e4-aace-600308960668"
+      assert user.avatar == @update_attrs.avatar
+      assert user.email == @update_attrs.email
+      assert user.first_name == @update_attrs.first_name
+      assert user.provider == @update_attrs.provider
+      assert user.uuid == @update_attrs.uuid
     end
 
     test "update_user/2 with invalid data returns error changeset" do

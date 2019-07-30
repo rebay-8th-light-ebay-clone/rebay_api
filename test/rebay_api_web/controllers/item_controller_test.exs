@@ -11,8 +11,8 @@ defmodule RebayApiWeb.ItemControllerTest do
   @create_attrs %{
     category: "some category",
     description: "some description",
-    end_date: "2019-07-31T06:59:59.000Z",
-    image: "some image",
+    end_date: "2030-07-31T06:59:59.000Z",
+    image: "http://www.some-image.foo",
     price: 1205,
     title: "some title",
     uuid: @uuid
@@ -20,8 +20,8 @@ defmodule RebayApiWeb.ItemControllerTest do
   @update_attrs %{
     category: "some updated category",
     description: "some updated description",
-    end_date: "2011-05-18T15:01:01Z",
-    image: "some updated image",
+    end_date: "2031-05-18T15:01:01Z",
+    image: "http://www.some-updated-image.foo",
     price: 4567,
     title: "some updated title"
   }
@@ -51,8 +51,8 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert json_response(conn, 200)["data"] == %{
         "category" => "some category",
         "description" => "some description",
-        "end_date" => "2019-07-31T06:59:59Z",
-        "image" => "some image",
+        "end_date" => "2030-07-31T06:59:59Z",
+        "image" => "http://www.some-image.foo",
         "price" => 1205,
         "title" => "some title",
         "uuid" => @uuid,
@@ -74,8 +74,8 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert %{
                "category" => "some category",
                "description" => "some description",
-               "end_date" => "2019-07-31T06:59:59Z",
-               "image" => "some image",
+               "end_date" => "2030-07-31T06:59:59Z",
+               "image" => "http://www.some-image.foo",
                "price" => 1205,
                "title" => "some title",
                "uuid" => uuid,
@@ -131,8 +131,8 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert %{
                "category" => "some updated category",
                "description" => "some updated description",
-               "end_date" => "2011-05-18T15:01:01Z",
-               "image" => "some updated image",
+               "end_date" => "2031-05-18T15:01:01Z",
+               "image" => "http://www.some-updated-image.foo",
                "price" => 4567,
                "title" => "some updated title",
                "uuid" => uuid,

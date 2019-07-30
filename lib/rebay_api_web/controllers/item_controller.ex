@@ -56,12 +56,7 @@ defmodule RebayApiWeb.ItemController do
     session_id = get_session(conn, :id)
 
     if conn.assigns[:user] && session_cookie == session_id do
-      user = conn
-      |> get_session(:user_uuid)
-      |> Accounts.get_user!
-
       conn
-      |> assign(:user, user)
     else
       conn
       |> put_status(:unauthorized)
