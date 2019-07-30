@@ -18,7 +18,7 @@ defmodule RebayApi.Listings do
 
   def update_item(%Item{} = item, attrs) do
     item
-    |> Item.changeset(attrs)
+    |> Item.update_changeset(attrs)
     |> Repo.update()
   end
 

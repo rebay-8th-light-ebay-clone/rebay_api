@@ -7,7 +7,7 @@ defmodule RebayApi.ListingsTest do
     alias RebayApi.Listings.Item
 
     @valid_attrs %{category: "some category", description: "some description", end_date: "2030-04-17T14:00:00Z", image: "http://www.some-image.foo", price: 1205, title: "some title", uuid: Ecto.UUID.generate()}
-    @update_attrs %{category: "some updated category", description: "some updated description", end_date: "2030-05-18T15:01:01Z", image: "http://www.some-updated-image.foo", price: 4567, title: "some updated title"}
+    @update_attrs %{category: "some updated category", description: "some updated description", end_date: "2030-05-18T15:01:01Z", image: "http://www.some-updated-image.foo", title: "some updated title"}
     @invalid_attrs %{category: nil, description: nil, end_date: nil, image: nil, price: nil, title: nil}
 
     def item_fixture(attrs \\ %{}) do
@@ -59,9 +59,16 @@ defmodule RebayApi.ListingsTest do
       assert item.category == @update_attrs.category
       assert item.description == @update_attrs.description
       assert item.image == @update_attrs.image
-      assert item.price == @update_attrs.price
+      assert item.price == @valid_attrs.price
       assert item.title == @update_attrs.title
       assert item.end_date == DateTime.from_naive!(~N[2030-05-18T15:01:01Z], "Etc/UTC")
+    end
+
+    test "update_item/2 with price returns error changeset" do
+      item = item_fixture()
+      invalid_attrs = Map.put(@valid_attrs, :price, 1000)
+      assert {:error, %Ecto.Changeset{}} = Listings.update_item(item, invalid_attrs)
+      assert item == Listings.get_item!(item.uuid)
     end
 
     test "update_item/2 with invalid data returns error changeset" do
