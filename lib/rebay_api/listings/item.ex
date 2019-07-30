@@ -19,6 +19,13 @@ defmodule RebayApi.Listings.Item do
     timestamps()
   end
 
+  def update_changeset(item, attrs) do
+    item
+    |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid, :user_id])
+    |> validate_required([:title, :description, :image, :price, :category, :end_date, :uuid])
+    |> forbid_price_update()
+  end
+
   def changeset(item, attrs) do
     item
     |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid, :user_id])
@@ -47,6 +54,12 @@ defmodule RebayApi.Listings.Item do
         true -> 
           []
       end
+    end)
+  end
+
+  def forbid_price_update(changeset) do
+    validate_change(changeset, :price, fn :price, _price ->
+      [price: "cannot be modified"]
     end)
   end
 end
