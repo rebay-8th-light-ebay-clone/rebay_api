@@ -17,7 +17,6 @@ defmodule RebayApi.Listings.Item do
     timestamps()
   end
 
-  @doc false
   def changeset(item, attrs) do
     item
     |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid, :user_id])

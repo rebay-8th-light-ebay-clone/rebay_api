@@ -9,9 +9,11 @@ defmodule RebayApiWeb.Router do
     plug :put_secure_browser_headers
     plug RebayApi.Plugs.SetUser
   end
-
+  
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session
+    plug RebayApi.Plugs.SetUser
   end
 
   scope "/api", RebayApiWeb do

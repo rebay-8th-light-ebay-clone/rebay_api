@@ -16,25 +16,15 @@ defmodule RebayApiWeb.ItemController do
   end
 
   def create(conn, _params) do
-    user_uuid = conn.params["user_uuid"]
-    user = Accounts.get_user!(user_uuid)
-
-    end_date = case conn.params["end_date"] do
-      nil ->
-        nil
-      _ ->
-        {:ok, end_date, _ } = DateTime.from_iso8601(conn.params["end_date"])
-        DateTime.truncate(end_date, :second)
-    end
+    user = conn.params["user_uuid"] |> Accounts.get_user!()
 
     create_attrs = Map.put(conn.params, "user_id", user.id)
     |> Map.put("uuid", Ecto.UUID.generate)
-    |> Map.put("end_date", end_date)
 
     with {:ok, %Item{} = item} <- Listings.create_item(create_attrs) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.user_item_path(conn, :show, user_uuid, item))
+      |> put_resp_header("location", Routes.user_item_path(conn, :show, user.uuid, item))
       |> render("show.json", item: item)
     end
   end
@@ -61,12 +51,11 @@ defmodule RebayApiWeb.ItemController do
   end
 
   defp authenticate_session(conn, _) do
-    conn = fetch_cookies(conn, [:session_id])
+    conn = fetch_cookies(conn, [:session_id]) 
     session_cookie = conn.cookies["session_id"]
-    conn = fetch_session(conn)
     session_id = get_session(conn, :id)
 
-    if session_cookie && session_id && session_cookie == session_id do
+    if conn.assigns[:user] && session_cookie == session_id do
       user = conn
       |> get_session(:user_uuid)
       |> Accounts.get_user!
@@ -80,9 +69,7 @@ defmodule RebayApiWeb.ItemController do
       |> render("401.json")
       |> halt()
     end
-
   end
-
 
   defp authorize_user(conn, _) do
     user_uuid_param = conn.params["user_uuid"]
