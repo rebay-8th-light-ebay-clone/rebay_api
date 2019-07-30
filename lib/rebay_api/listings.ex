@@ -12,7 +12,7 @@ defmodule RebayApi.Listings do
 
   def create_item(attrs \\ %{}) do
     %Item{}
-    |> Item.changeset(attrs)
+    |> Item.create_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -27,6 +27,6 @@ defmodule RebayApi.Listings do
   end
 
   def change_item(%Item{} = item) do
-    Item.changeset(item, %{})
+    Item.shared_changeset(item, %{})
   end
 end
