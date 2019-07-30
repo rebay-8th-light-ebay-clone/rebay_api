@@ -34,10 +34,10 @@ defmodule RebayApiWeb.ItemController do
     render(conn, "show.json", item: item)
   end
 
-  def update(conn, %{"uuid" => uuid, "item" => item_params}) do
-    item = Listings.get_item!(uuid)
+  def update(conn, params) do
+    item = Listings.get_item!(params["uuid"])
 
-    with {:ok, %Item{} = item} <- Listings.update_item(item, item_params) do
+    with {:ok, %Item{} = item} <- Listings.update_item(item, params) do
       render(conn, "show.json", item: item)
     end
   end

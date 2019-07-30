@@ -20,19 +20,21 @@ defmodule RebayApi.Listings.Item do
   end
 
   def update_changeset(item, attrs) do
-    item
-    |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid, :user_id])
-    |> validate_required([:title, :description, :image, :price, :category, :end_date, :uuid])
+    shared_changeset(item, attrs)
     |> forbid_price_update()
     |> forbid_end_date_update()
   end
 
-  def changeset(item, attrs) do
+  def create_changeset(item, attrs) do
+    shared_changeset(item, attrs)
+    |> validate_end_date()
+    |> validate_price()
+  end
+
+  def shared_changeset(item, attrs) do
     item
     |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid, :user_id])
     |> validate_required([:title, :description, :image, :price, :category, :end_date, :uuid])
-    |> validate_end_date()
-    |> validate_price()
   end
 
   def validate_end_date(changeset) do
