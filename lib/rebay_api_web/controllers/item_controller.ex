@@ -8,7 +8,7 @@ defmodule RebayApiWeb.ItemController do
   action_fallback RebayApiWeb.FallbackController
 
   plug :authenticate_session when action in [:create, :update, :delete]
-  # plug :authorize_user when action in [:create, :update, :delete]
+  plug :authorize_user when action in [:create, :update, :delete]
 
   def index(conn, _params) do
     items = Listings.list_items()
@@ -63,37 +63,39 @@ defmodule RebayApiWeb.ItemController do
   defp authenticate_session(conn, _) do
     conn = fetch_cookies(conn, [:session_id])
     session_cookie = conn.cookies["session_id"]
+    conn = fetch_session(conn)
+    session_id = get_session(conn, :id)
 
-    session_id = if conn.assigns[:user] do
-      get_session(conn, :id)
+    if session_cookie && session_id && session_cookie == session_id do
+      user = conn
+      |> get_session(:user_uuid)
+      |> Accounts.get_user!
+
+      conn
+      |> assign(:user, user)
     else
-      nil
+      conn
+      |> put_status(:unauthorized)
+      |> put_view(RebayApiWeb.ErrorView)
+      |> render("401.json")
+      |> halt()
     end
 
-    case session_cookie do
-      nil ->
-        conn
-        |> put_status(:unauthorized)
-        |> put_view(RebayApiWeb.ErrorView)
-        |> render("401.json")
-        |> halt()
-      session_id ->
-        conn
-    end
   end
 
-  # defp authorize_user(conn, _) do
-  #   user_uuid_param = conn.params["user_uuid"]
-  #   current_user = conn.assigns[:user]
 
-  #   if current_user != nil && user_uuid_param == current_user.uuid do
-  #     conn
-  #   else
-  #     conn
-  #     |> put_status(:unauthorized)
-  #     |> put_view(RebayApiWeb.ErrorView)
-  #     |> render("401.json")
-  #     |> halt()
-  #   end
-  # end
+  defp authorize_user(conn, _) do
+    user_uuid_param = conn.params["user_uuid"]
+    current_user = conn.assigns[:user]
+
+    if current_user != nil && user_uuid_param == current_user.uuid do
+      conn
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> put_view(RebayApiWeb.ErrorView)
+      |> render("401.json")
+      |> halt()
+    end
+  end
 end

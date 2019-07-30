@@ -67,6 +67,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       conn = conn
       |> assign(:user, user)
       |> init_test_session(id: "test_id_token")
+      |> put_session(:user_uuid, user.uuid)
       |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
       |> post(Routes.user_item_path(conn, :create, user.uuid), @create_attrs)
 
@@ -90,6 +91,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       conn = conn
       |> assign(:user, user)
       |> init_test_session(id: "test_id_token")
+      |> put_session(:user_uuid, user.uuid)
       |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
       |> post(Routes.user_item_path(conn, :create, user.uuid), @create_attrs)
 
@@ -122,6 +124,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       user = TestHelpers.user_fixture()
       conn = conn
       |> init_test_session(id: "test_id_token")
+      |> put_session(:user_uuid, user.uuid)
       |> assign(:user, user)
       |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
       conn = post(conn, Routes.user_item_path(conn, :create, user.uuid), @invalid_attrs)
@@ -136,6 +139,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       user = TestHelpers.user_fixture()
       conn = conn
       |> init_test_session(id: "test_id_token")
+      |> put_session(:user_uuid, user.uuid)
       |> assign(:user, user)
       |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
       conn = put(conn, Routes.user_item_path(conn, :update, user.uuid, item.uuid), [item: @update_attrs])
@@ -179,6 +183,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       user = TestHelpers.user_fixture()
       conn = conn
       |> init_test_session(id: "test_id_token")
+      |> put_session(:user_uuid, user.uuid)
       |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
       |> assign(:user, user)
       conn = put(conn, Routes.user_item_path(conn, :update, user.uuid, item.uuid), item: @invalid_attrs)
@@ -193,6 +198,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       user = TestHelpers.user_fixture()
       conn = conn
       |> init_test_session(id: "test_id_token")
+      |> put_session(:user_uuid, user.uuid)
       |> assign(:user, user)
       |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
       conn = delete(conn, Routes.user_item_path(conn, :delete, user.uuid, item.uuid))
