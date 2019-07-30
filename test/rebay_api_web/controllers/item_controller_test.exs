@@ -20,7 +20,6 @@ defmodule RebayApiWeb.ItemControllerTest do
   @update_attrs %{
     category: "some updated category",
     description: "some updated description",
-    end_date: "2031-05-18T15:01:01Z",
     image: "http://www.some-updated-image.foo",
     title: "some updated title"
   }
@@ -130,7 +129,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert %{
                "category" => "some updated category",
                "description" => "some updated description",
-               "end_date" => "2031-05-18T15:01:01Z",
+               "end_date" => "2030-07-31T06:59:59Z",
                "image" => "http://www.some-updated-image.foo",
                "price" => 1205,
                "title" => "some updated title",
