@@ -16,7 +16,7 @@ defmodule RebayApiWeb.ItemControllerTest do
     image: "http://www.some-image.foo",
     price: 1205,
     title: "some title",
-    uuid: @uuid
+    uuid: @uuid,
   }
   @update_attrs %{
     category: "some updated category",
@@ -178,7 +178,7 @@ defmodule RebayApiWeb.ItemControllerTest do
     test "renders error when request is not authenticated", %{conn: conn, item: item, user: user} do
       conn = init_test_session(conn, id: "test_id_token")
       |> delete(Routes.user_item_path(conn, :delete, user.uuid, item.uuid))
-      
+
       assert json_response(conn, 401)["errors"] != %{}
     end
   end
