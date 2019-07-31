@@ -2,7 +2,6 @@ defmodule RebayApi.BidTest do
   use RebayApi.DataCase
 
   alias RebayApi.UserItem.Bid
-  alias RebayApi.Accounts.User
   alias RebayApi.Listings.Item
   alias RebayApi.TestHelpers
 

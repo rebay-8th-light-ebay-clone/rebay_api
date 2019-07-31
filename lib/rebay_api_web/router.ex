@@ -9,7 +9,7 @@ defmodule RebayApiWeb.Router do
     plug :put_secure_browser_headers
     plug RebayApi.Plugs.SetUser
   end
-  
+
   pipeline :api do
     plug :accepts, ["json"]
     plug :fetch_session
@@ -23,7 +23,7 @@ defmodule RebayApiWeb.Router do
       get "/bids", BidController, :index_by_user
     end
     resources "/items", ItemController, only: [:index], param: "uuid" do
-      resources "/bids", BidController, param: "uuid"
+      resources "/bids", BidController, param: "uuid", only: [:index, :create, :show]
     end
   end
 
