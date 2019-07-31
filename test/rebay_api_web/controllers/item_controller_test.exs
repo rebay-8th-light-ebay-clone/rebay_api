@@ -64,7 +64,7 @@ defmodule RebayApiWeb.ItemControllerTest do
   describe "create item" do
     setup [:create_user]
     test "renders item when data is valid", %{conn: conn, user: user} do
-      conn = valid_session(conn, user)
+      conn = TestHelpers.valid_session(conn, user)
       |> post(Routes.user_item_path(conn, :create, user.uuid), @create_attrs)
 
       assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
@@ -83,7 +83,7 @@ defmodule RebayApiWeb.ItemControllerTest do
     end
 
     test "associates the item with the correct user", %{conn: conn, user: user} do
-      conn = valid_session(conn, user)
+      conn = TestHelpers.valid_session(conn, user)
       |> post(Routes.user_item_path(conn, :create, user.uuid), @create_attrs)
 
       assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
@@ -110,7 +110,7 @@ defmodule RebayApiWeb.ItemControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, user: user} do
-      conn = valid_session(conn, user)
+      conn = TestHelpers.valid_session(conn, user)
       |> post(Routes.user_item_path(conn, :create, user.uuid), @invalid_attrs)
 
       assert json_response(conn, 422)["errors"] != %{}
@@ -121,7 +121,7 @@ defmodule RebayApiWeb.ItemControllerTest do
     setup [:create_item, :create_user]
 
     test "renders item when data is valid", %{conn: conn, item: %Item{uuid: uuid} = item, user: user} do
-      conn = valid_session(conn, user)
+      conn = TestHelpers.valid_session(conn, user)
       |> put(Routes.user_item_path(conn, :update, user.uuid, item.uuid), [item: @update_attrs])
 
       assert %{"uuid" => ^uuid} = json_response(conn, 200)["data"]
@@ -147,14 +147,14 @@ defmodule RebayApiWeb.ItemControllerTest do
     end
 
     test "renders error when user is not authorized", %{conn: conn, item: item, user: user} do
-      conn = valid_session(conn, user)
+      conn = TestHelpers.valid_session(conn, user)
       |> put(Routes.user_item_path(conn, :update, item.user.uuid, item.uuid), [item: @update_attrs, cookie: %{session_id: "test_id_token"}])
 
       assert json_response(conn, 401)["errors"] != %{}
     end
 
     test "renders errors when data is invalid", %{conn: conn, item: item, user: user} do
-      conn = valid_session(conn, user)
+      conn = TestHelpers.valid_session(conn, user)
       |> put(Routes.user_item_path(conn, :update, user.uuid, item.uuid), item: @invalid_attrs)
 
       assert json_response(conn, 422)["errors"] != %{}
@@ -165,7 +165,7 @@ defmodule RebayApiWeb.ItemControllerTest do
     setup [:create_item, :create_user]
 
     test "deletes chosen item", %{conn: conn, item: item, user: user} do
-      conn = valid_session(conn, user)
+      conn = TestHelpers.valid_session(conn, user)
       |> delete(Routes.user_item_path(conn, :delete, user.uuid, item.uuid))
 
       assert response(conn, 204)
@@ -195,13 +195,5 @@ defmodule RebayApiWeb.ItemControllerTest do
   defp create_user(_) do
     user = TestHelpers.user_fixture()
     {:ok, user: user}
-  end
-
-  defp valid_session(conn, user) do
-    conn
-    |> assign(:user, user)
-    |> init_test_session(id: "test_id_token")
-    |> put_session(:user_uuid, user.uuid)
-    |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
   end
 end

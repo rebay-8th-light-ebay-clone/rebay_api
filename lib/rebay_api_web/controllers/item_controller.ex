@@ -7,8 +7,8 @@ defmodule RebayApiWeb.ItemController do
 
   action_fallback RebayApiWeb.FallbackController
 
-  plug :authenticate_session when action in [:create, :update, :delete]
-  plug :authorize_user when action in [:create, :update, :delete]
+  plug RebayApiWeb.Plugs.AuthenticateSession when action in [:create, :update, :delete]
+  plug RebayApiWeb.Plugs.AuthorizeUser when action in [:create, :update, :delete]
 
   def index(conn, _params) do
     items = Listings.list_items()
@@ -47,37 +47,6 @@ defmodule RebayApiWeb.ItemController do
 
     with {:ok, %Item{}} <- Listings.delete_item(item) do
       send_resp(conn, :no_content, "")
-    end
-  end
-
-  defp authenticate_session(conn, _) do
-    conn = fetch_cookies(conn, [:session_id]) 
-    session_cookie = conn.cookies["session_id"]
-    session_id = get_session(conn, :id)
-
-    if conn.assigns[:user] && session_cookie == session_id do
-      conn
-    else
-      conn
-      |> put_status(:unauthorized)
-      |> put_view(RebayApiWeb.ErrorView)
-      |> render("401.json")
-      |> halt()
-    end
-  end
-
-  defp authorize_user(conn, _) do
-    user_uuid_param = conn.params["user_uuid"]
-    current_user = conn.assigns[:user]
-
-    if current_user != nil && user_uuid_param == current_user.uuid do
-      conn
-    else
-      conn
-      |> put_status(:unauthorized)
-      |> put_view(RebayApiWeb.ErrorView)
-      |> render("401.json")
-      |> halt()
     end
   end
 end

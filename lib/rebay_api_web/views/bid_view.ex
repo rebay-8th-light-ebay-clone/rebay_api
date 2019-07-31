@@ -5,7 +5,7 @@ defmodule RebayApiWeb.BidView do
   alias RebayApi.UserItem
   alias RebayApiWeb.ItemView
 
-  def render("index.json", %{bids: bids}) do
+  def render("index_by_item.json", %{bids: bids}) do
     %{data: render_many(bids, BidView, "bid.json")}
   end
 
