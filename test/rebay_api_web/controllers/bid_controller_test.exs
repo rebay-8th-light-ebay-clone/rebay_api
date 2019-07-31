@@ -118,7 +118,6 @@ defmodule RebayApiWeb.BidControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-
     test "returns error when user is logged in but request is not authenticated", %{conn: conn} do
       item = TestHelpers.item_fixture
       conn = init_test_session(conn, id: "test_id_token")
