@@ -23,7 +23,8 @@ defmodule RebayApiWeb.Router do
       get "/bids", BidController, :index_by_user
     end
     resources "/items", ItemController, only: [:index], param: "uuid" do
-      resources "/bids", BidController, param: "uuid", only: [:index, :create, :show]
+      resources "/bids", BidController, param: "uuid", only: [:create, :show]
+      get "/bids", BidController, :index_by_item
     end
   end
 

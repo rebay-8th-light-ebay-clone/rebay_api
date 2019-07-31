@@ -1,9 +1,18 @@
 defmodule RebayApi.TestHelpers do
+  use Plug.Test
+
   alias RebayApi.Repo
   alias RebayApi.Accounts.User
   alias RebayApi.Listings.Item
   alias RebayApi.UserItem.Bid
 
+  def valid_session(conn, user) do
+    conn
+    |> assign(:user, user)
+    |> init_test_session(id: "test_id_token")
+    |> put_session(:user_uuid, user.uuid)
+    |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
+  end
 
   def user_fixture(attrs \\ %{}) do
     params =

@@ -38,7 +38,7 @@ defmodule RebayApiWeb.BidControllerTest do
     test "lists all bids for an item", %{conn: conn, bid: bid} do
       item_id = bid.item_id
       item_uuid = Listings.get_item_by_id!(item_id).uuid
-      conn = get(conn, Routes.item_bid_path(conn, :index, item_uuid))
+      conn = get(conn, Routes.item_bid_path(conn, :index_by_item, item_uuid))
       assert [%{
         "bid_price" => 42,
         "uuid" => @uuid,
@@ -47,6 +47,7 @@ defmodule RebayApiWeb.BidControllerTest do
     end
 
     test "list all bids for a user", %{conn: conn, bid: bid} do
+      conn = TestHelpers.valid_session(conn, bid.user)
       conn = get(conn, Routes.user_bid_path(conn, :index_by_user, bid.user.uuid))
       assert [
         %{
@@ -70,6 +71,26 @@ defmodule RebayApiWeb.BidControllerTest do
           }
         }
       ] = json_response(conn, 200)["data"]
+    end
+
+    test "returns error when user is logged in but request is not authenticated", %{conn: conn, bid: bid} do
+      conn = init_test_session(conn, id: "test_id_token")
+      |> get(Routes.user_bid_path(conn, :index_by_user, bid.user.uuid))
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "renders error when user is not logged in", %{conn: conn, bid: bid} do
+      conn = conn |> get(Routes.user_bid_path(conn, :index_by_user, bid.user.uuid))
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "returns error when a logged in user tries to retrieve another users bids", %{conn: conn, bid: bid} do
+      conn = TestHelpers.valid_session(conn, bid.user)
+      |> get(Routes.user_bid_path(conn, :index_by_user, Ecto.UUID.generate()))
+
+      assert json_response(conn, 401)["errors"] != %{}
     end
   end
 
