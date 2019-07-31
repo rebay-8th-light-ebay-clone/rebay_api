@@ -120,8 +120,8 @@ defmodule RebayApiWeb.ItemControllerTest do
     setup [:create_item, :create_user]
 
     test "renders item when data is valid", %{conn: conn, item: %Item{uuid: uuid} = item, user: %User{uuid: user_uuid} = user} do
-      conn = valid_session(conn, user)
-      |> put(Routes.user_item_path(conn, :update, user.uuid, item.uuid), @update_attrs)
+      conn = TestHelpers.valid_session(conn, user)
+      |> put(Routes.user_item_path(conn, :update, user_uuid, uuid), @update_attrs)
 
       assert %{"uuid" => ^uuid} = json_response(conn, 200)["data"]
 
