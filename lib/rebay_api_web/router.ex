@@ -18,7 +18,7 @@ defmodule RebayApiWeb.Router do
 
   scope "/api", RebayApiWeb do
     pipe_through :api
-    resources "/users", UserController, except: [:new, :edit], param: "uuid" do
+    resources "/users", UserController, only: [:index, :show, :create], param: "uuid" do
       resources "/items", ItemController, except: [:new, :edit], param: "uuid"
       get "/bids", BidController, :index_by_user
     end
