@@ -4,6 +4,7 @@ defmodule RebayApiWeb.ItemControllerTest do
 
   alias RebayApi.Listings
   alias RebayApi.Listings.Item
+  alias RebayApi.Accounts.User
   alias RebayApi.TestHelpers
   alias RebayApi.Repo
 
@@ -120,9 +121,9 @@ defmodule RebayApiWeb.ItemControllerTest do
   describe "update item" do
     setup [:create_item, :create_user]
 
-    test "renders item when data is valid", %{conn: conn, item: %Item{uuid: uuid} = item, user: user} do
+    test "renders item when data is valid", %{conn: conn, item: %Item{uuid: uuid} = item, user: %User{uuid: user_uuid} = user} do
       conn = TestHelpers.valid_session(conn, user)
-      |> put(Routes.user_item_path(conn, :update, user.uuid, item.uuid), [item: @update_attrs])
+      |> put(Routes.user_item_path(conn, :update, user_uuid, uuid), @update_attrs)
 
       assert %{"uuid" => ^uuid} = json_response(conn, 200)["data"]
 
@@ -135,6 +136,7 @@ defmodule RebayApiWeb.ItemControllerTest do
                "image" => "http://www.some-updated-image.foo",
                "price" => 4567,
                "title" => "some updated title",
+               "user_uuid" => user_uuid,
                "uuid" => uuid,
              } = json_response(conn, 200)["data"]
     end
@@ -155,7 +157,7 @@ defmodule RebayApiWeb.ItemControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn, item: item, user: user} do
       conn = TestHelpers.valid_session(conn, user)
-      |> put(Routes.user_item_path(conn, :update, user.uuid, item.uuid), item: @invalid_attrs)
+      |> put(Routes.user_item_path(conn, :update, user.uuid, item.uuid), @invalid_attrs)
 
       assert json_response(conn, 422)["errors"] != %{}
     end
