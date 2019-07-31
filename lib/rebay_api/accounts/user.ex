@@ -3,6 +3,7 @@ defmodule RebayApi.Accounts.User do
   import Ecto.Changeset
 
   alias RebayApi.Listings.Item
+  alias RebayApi.UserItem.Bid
 
   schema "users" do
     field :avatar, :string
@@ -11,6 +12,7 @@ defmodule RebayApi.Accounts.User do
     field :provider, :string
     field :uuid, Ecto.UUID
     has_many :items, Item
+    has_many :bids, Bid
 
     timestamps()
   end

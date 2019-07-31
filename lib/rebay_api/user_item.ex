@@ -7,6 +7,8 @@ defmodule RebayApi.UserItem do
   alias RebayApi.Repo
 
   alias RebayApi.UserItem.Bid
+  alias RebayApi.Listings
+  alias RebayApi.Accounts
 
   @doc """
   Returns the list of bids.
@@ -19,6 +21,28 @@ defmodule RebayApi.UserItem do
   """
   def list_bids do
     Repo.all(Bid)
+  end
+
+  def list_bids_by_item(item_uuid) do
+    bidItem = Listings.get_item!(item_uuid)
+    query = from bid in Bid, where: ^bidItem.uuid == ^item_uuid
+    Repo.all(query, preload: [:item])
+  end
+
+  def list_bids_by_user(user_uuid) do
+    bidUser = Accounts.get_user!(user_uuid)
+    query = from bid in Bid, where: ^bidUser.uuid == ^user_uuid, select: bid.item_id, distinct: bid.item_id
+    user_item_ids = Repo.all(query, preload: [:user, :item])
+
+    Enum.reduce user_item_ids, [], fn (item_id, acc) ->
+      bid_query = from bid in Bid, where: ^bidUser.uuid == ^user_uuid and ^item_id == bid.item_id, select: bid
+
+      item_bid = %{}
+      |> Map.put(:item, Listings.get_item_by_id!(item_id))
+      |> Map.put(:bids, Repo.all(bid_query, preload: [:user, :item]))
+
+      acc ++ [item_bid]
+    end
   end
 
   @doc """
@@ -35,7 +59,7 @@ defmodule RebayApi.UserItem do
       ** (Ecto.NoResultsError)
 
   """
-  def get_bid!(id), do: Repo.get!(Bid, id)
+  def get_bid!(uuid), do: Repo.get_by!(Bid, uuid: uuid)
 
   @doc """
   Creates a bid.

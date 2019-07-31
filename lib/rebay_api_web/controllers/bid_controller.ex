@@ -6,35 +6,40 @@ defmodule RebayApiWeb.BidController do
 
   action_fallback RebayApiWeb.FallbackController
 
-  def index(conn, _params) do
-    bids = UserItem.list_bids()
+  def index(conn, %{"item_uuid" => item_uuid}) do
+    bids = UserItem.list_bids_by_item(item_uuid)
     render(conn, "index.json", bids: bids)
   end
 
-  def create(conn, %{"bid" => bid_params}) do
+  def index_by_user(conn, %{"user_uuid" => user_uuid}) do
+    bids = UserItem.list_bids_by_user(user_uuid)
+    render(conn, "index_by_user.json", bids: bids)
+  end
+
+  def create(conn, %{"bid" => bid_params, "item_uuid" => item_uuid}) do
     with {:ok, %Bid{} = bid} <- UserItem.create_bid(bid_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.bid_path(conn, :show, bid))
+      |> put_resp_header("location", Routes.item_bid_path(conn, :show, item_uuid, bid))
       |> render("show.json", bid: bid)
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    bid = UserItem.get_bid!(id)
+  def show(conn, %{"uuid" => uuid, "item_uuid" => item_uuid}) do
+    bid = UserItem.get_bid!(uuid)
     render(conn, "show.json", bid: bid)
   end
 
-  def update(conn, %{"id" => id, "bid" => bid_params}) do
-    bid = UserItem.get_bid!(id)
+  def update(conn, %{"uuid" => uuid, "item_uuid" => item_uuid, "bid" => bid_params}) do
+    bid = UserItem.get_bid!(uuid)
 
     with {:ok, %Bid{} = bid} <- UserItem.update_bid(bid, bid_params) do
       render(conn, "show.json", bid: bid)
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    bid = UserItem.get_bid!(id)
+  def delete(conn, %{"uuid" => uuid, "item_uuid" => item_uuid}) do
+    bid = UserItem.get_bid!(uuid)
 
     with {:ok, %Bid{}} <- UserItem.delete_bid(bid) do
       send_resp(conn, :no_content, "")
