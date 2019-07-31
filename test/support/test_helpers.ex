@@ -38,7 +38,7 @@ defmodule RebayApi.TestHelpers do
       |> Enum.into(%{
         category: "some category",
         description: "some description",
-        end_date: "2019-07-31T06:59:59.000Z",
+        end_date: "2020-07-31T06:59:59.000Z",
         image: "some image",
         price: 1205,
         title: "some title",
