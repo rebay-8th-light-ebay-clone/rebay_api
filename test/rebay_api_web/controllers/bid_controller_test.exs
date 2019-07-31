@@ -18,7 +18,7 @@ defmodule RebayApiWeb.BidControllerTest do
 
   def create_bid_attrs() do
     user = TestHelpers.user_fixture(%{ uuid: @user_uuid })
-    item = TestHelpers.item_fixture(%{ user_id: user.id, uuid: @item_uuid })
+    item = TestHelpers.item_fixture(%{ user_id: user.id, uuid: @item_uuid,  end_date: "2020-08-31T06:59:59Z", })
     %{
       bid_price: 42,
       uuid: @uuid,
@@ -65,7 +65,7 @@ defmodule RebayApiWeb.BidControllerTest do
           "item" => %{
             "category" => "some category",
             "description" => "some description",
-            "end_date" => "2019-07-31T06:59:59Z",
+            "end_date" => "2020-08-31T06:59:59Z",
             "image" => "some image",
             "price" => 1205,
             "title" => "some title",

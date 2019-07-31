@@ -25,7 +25,7 @@ defmodule RebayApi.Listings.Item do
     |> forbid_end_date_update()
   end
 
-  def create_changeset(item, attrs) do
+  def changeset(item, attrs) do
     shared_changeset(item, attrs)
     |> validate_end_date()
     |> validate_price()

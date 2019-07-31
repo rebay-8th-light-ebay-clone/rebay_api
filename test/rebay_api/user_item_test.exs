@@ -26,11 +26,13 @@ defmodule RebayApi.UserItemTest do
       user = TestHelpers.user_fixture(%{uuid: @user_uuid})
       item1 = TestHelpers.item_fixture(%{
         title: "item 1 title",
-        user_id: user.id
+        user_id: user.id,
+        end_date: "2020-08-31T06:59:59Z"
       })
       item2 = TestHelpers.item_fixture(%{
         title: "item 2 title",
-        user_id: user.id
+        user_id: user.id,
+        end_date: "2020-08-31T06:59:59Z"
       })
       bid1 = bid_fixture(%{
         bid_price: 1,
