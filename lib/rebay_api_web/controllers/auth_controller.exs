@@ -22,7 +22,6 @@ defmodule RebayApiWeb.AuthController do
     conn
     |> put_session(:user_id, user.uuid)
     |> redirect_to(to: user_path(conn, :show, user))
-    # |> redirect(to: UserController.show(conn, %{"id" => user.uuid}))
   end
 
   def signout(conn, _params) do

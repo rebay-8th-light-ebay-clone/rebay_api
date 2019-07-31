@@ -29,20 +29,4 @@ defmodule RebayApiWeb.BidController do
     bid = UserItem.get_bid!(uuid)
     render(conn, "show.json", bid: bid)
   end
-
-  def update(conn, %{"uuid" => uuid, "item_uuid" => item_uuid, "bid" => bid_params}) do
-    bid = UserItem.get_bid!(uuid)
-
-    with {:ok, %Bid{} = bid} <- UserItem.update_bid(bid, bid_params) do
-      render(conn, "show.json", bid: bid)
-    end
-  end
-
-  def delete(conn, %{"uuid" => uuid, "item_uuid" => item_uuid}) do
-    bid = UserItem.get_bid!(uuid)
-
-    with {:ok, %Bid{}} <- UserItem.delete_bid(bid) do
-      send_resp(conn, :no_content, "")
-    end
-  end
 end
