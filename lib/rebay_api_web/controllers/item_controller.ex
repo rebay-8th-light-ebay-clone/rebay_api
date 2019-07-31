@@ -15,10 +15,10 @@ defmodule RebayApiWeb.ItemController do
     render(conn, "index.json", items: items)
   end
 
-  def create(conn, _params) do
-    user = conn.params["user_uuid"] |> Accounts.get_user!()
+  def create(conn, params) do
+    user = params["user_uuid"] |> Accounts.get_user!()
 
-    create_attrs = Map.put(conn.params, "user_id", user.id)
+    create_attrs = Map.put(params, "user_id", user.id)
     |> Map.put("uuid", Ecto.UUID.generate)
 
     with {:ok, %Item{} = item} <- Listings.create_item(create_attrs) do
