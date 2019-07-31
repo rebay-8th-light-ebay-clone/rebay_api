@@ -96,7 +96,10 @@ defmodule RebayApiWeb.BidControllerTest do
 
   describe "create bid" do
     test "renders bid when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.item_bid_path(conn, :create, @item_uuid), bid: create_bid_attrs())
+      user = TestHelpers.user_fixture()
+      conn = conn
+      |> TestHelpers.valid_session(user)
+      |> post(Routes.item_bid_path(conn, :create, @item_uuid), bid: create_bid_attrs())
       assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
 
       conn = get(conn, Routes.item_bid_path(conn, :show, 1, uuid))
@@ -108,8 +111,27 @@ defmodule RebayApiWeb.BidControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.item_bid_path(conn, :create, @item_uuid), bid: @invalid_attrs)
+      user = TestHelpers.user_fixture()
+      conn = conn
+      |> TestHelpers.valid_session(user)
+      |> post(Routes.item_bid_path(conn, :create, @item_uuid), bid: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+
+    test "returns error when user is logged in but request is not authenticated", %{conn: conn} do
+      item = TestHelpers.item_fixture
+      conn = init_test_session(conn, id: "test_id_token")
+      |> post(Routes.item_bid_path(conn, :create, item.uuid), bid: create_bid_attrs())
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "renders error when user is not logged in", %{conn: conn} do
+      item = TestHelpers.item_fixture
+      conn = conn |> post(Routes.item_bid_path(conn, :create, item.uuid), bid: create_bid_attrs())
+
+      assert json_response(conn, 401)["errors"] != %{}
     end
   end
 

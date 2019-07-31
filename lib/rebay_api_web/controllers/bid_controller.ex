@@ -6,7 +6,7 @@ defmodule RebayApiWeb.BidController do
 
   action_fallback RebayApiWeb.FallbackController
 
-  plug RebayApiWeb.Plugs.AuthenticateSession when action in [:index_by_user]
+  plug RebayApiWeb.Plugs.AuthenticateSession when action in [:index_by_user, :create]
   plug RebayApiWeb.Plugs.AuthorizeUser when action in [:index_by_user]
 
   def index_by_item(conn, %{"item_uuid" => item_uuid}) do
