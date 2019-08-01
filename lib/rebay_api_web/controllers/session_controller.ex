@@ -5,6 +5,8 @@ defmodule RebayApiWeb.SessionController do
   alias RebayApi.Repo
   alias RebayApi.Accounts.User
 
+  @client_host Application.get_env(:rebay_api, :client_host)
+
   def create(%{assigns: %{ueberauth_auth: auth}} = conn, %{"provider" => provider}) do
     user_params = user_params(auth, provider)
     changeset = User.changeset(%User{}, user_params)
@@ -15,7 +17,7 @@ defmodule RebayApiWeb.SessionController do
         |> put_session(:id, auth.credentials.token)
         |> put_session(:user_uuid, user.uuid)
         |> put_resp_cookie("session_id", auth.credentials.token, [http_only: true])
-        |> redirect(external: "#{Application.get_env(:rebay_api, :client_host)}/login/#{user.uuid}")
+        |> redirect(external: "#{@client_host}/login/#{user.uuid}")
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_view(RebayApiWeb.ChangesetView)
@@ -26,7 +28,7 @@ defmodule RebayApiWeb.SessionController do
   def delete(conn, _params) do
     conn
     |> configure_session(drop: true)
-    |> redirect(to: Routes.item_path(conn, :index))
+    |> redirect(external: "#{@client_host}")
   end
 
   defp user_params(auth, provider) do
