@@ -14,6 +14,11 @@ defmodule RebayApiWeb.ItemController do
     items = Listings.list_items()
     render(conn, "index.json", items: items)
   end
+  
+  def index_by_user(conn, %{"user_uuid" => user_uuid}) do
+    user_items = Listings.get_items_by_user(user_uuid)
+    render(conn, "index.json", items: user_items)
+  end
 
   def create(conn, params) do
     user = params["user_uuid"] |> Accounts.get_user!()
