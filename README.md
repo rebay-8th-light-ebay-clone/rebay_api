@@ -19,6 +19,15 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
 
+## Setting up Environment Variables
+-  Create a .env file in your root and add the following
+```
+export GOOGLE_CLIENT_ID="Get from Teammate"
+export GOOGLE_CLIENT_SECRET="Get from Teammate"
+export CLIENT_HOST=http://localhost:<client_port>
+```
+- `source .env`
+
 # Seeding Postgres Data
 `mix ecto.migrate`
 `mix run priv/repo/seeds.exs`
