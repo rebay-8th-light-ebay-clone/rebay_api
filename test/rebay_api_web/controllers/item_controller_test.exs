@@ -4,7 +4,6 @@ defmodule RebayApiWeb.ItemControllerTest do
 
   alias RebayApi.Listings
   alias RebayApi.Listings.Item
-  alias RebayApi.Accounts.User
   alias RebayApi.Accounts
   alias RebayApi.TestHelpers
   alias RebayApi.Repo
@@ -61,7 +60,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       }]
     end
 
-    test "return empty is user has no items", %{conn: conn, item: item} do
+    test "return empty is user has no items", %{conn: conn} do
       user = TestHelpers.user_fixture()
       conn = get(conn, Routes.user_item_path(conn, :index_by_user, user.uuid))
       assert json_response(conn, 200)["data"] == []
