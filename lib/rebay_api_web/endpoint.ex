@@ -40,5 +40,6 @@ defmodule RebayApiWeb.Endpoint do
     key: "_rebay_api_key",
     signing_salt: "MNLBI3Ew"
 
+  plug CORSPlug, origin: ["https://rebay-app.herokuapp.com", "http://localhost:3000"]
   plug RebayApiWeb.Router
 end

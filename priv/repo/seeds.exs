@@ -14,7 +14,21 @@ alias RebayApi.Repo
 alias RebayApi.Listings.Item
 alias RebayApi.Accounts.User
 
-date = DateTime.utc_now() |> DateTime.truncate(:second)
+# date = DateTime.utc_now() |> DateTime.truncate(:second)
+{:ok, date, _} = DateTime.from_iso8601("2019-07-31T06:59:59.000Z")
+date = date |> DateTime.truncate(:second)
+
+user = %User{
+  avatar: "image-url.foo",
+  email: "travis@foo.fake",
+  first_name: "Travis",
+  provider: "google",
+  uuid: Ecto.UUID.generate(),
+}
+Repo.insert!(user)
+
+user = Repo.get_by(User, uuid: user.uuid)
+
 
 Repo.insert!(
   %Item{
@@ -45,7 +59,9 @@ Repo.insert!(
     end_date: date,
     image: "https://d3o372dlsg9lxo.cloudfront.net/catalog/products/d1525/images/enlarge/595fccf0bbddbd3afbd7d8f0/D1525_170511_106_D1525.jpg",
     price: 7500,
-    category: "Home & Garden"
+    category: "Home & Garden",
+    uuid: Ecto.UUID.generate(),
+    user_id: user.id
 })
 
 Repo.insert!(
@@ -56,8 +72,11 @@ Repo.insert!(
     end_date: date,
     image: "https://i.ebayimg.com/images/g/ma8AAOSw4ZVcUzaV/s-l300.jpg",
     price: 4000,
-    category: "Electronics"
+    category: "Electronics",
+    uuid: Ecto.UUID.generate(),
+    user_id: user.id
 })
+
 
 Repo.insert!(
   %Item{
@@ -67,15 +86,7 @@ Repo.insert!(
     end_date: date,
     image: "https://i.ebayimg.com/images/g/zdEAAOSwAetdLkzO/s-l1600.jpg",
     price: 6000,
-    category: "Fashion"
-})
-
-Repo.insert!(
-  %User{
-    avatar: "image-url.foo",
-    email: "travis@foo.fake",
-    first_name: "Travis",
-    provider: "google",
+    category: "Fashion",
     uuid: Ecto.UUID.generate(),
-  }
-)
+    user_id: user.id,
+})

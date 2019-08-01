@@ -30,8 +30,9 @@ defmodule RebayApiWeb.SessionControllerTest do
 
     users = User |> Repo.all
     [ user | _ ] = users
+    
     assert Enum.count(users) == 1
-    assert get_resp_header(conn, "location") == ["http://localhost:3000/login/#{user.uuid}"]
+    assert get_resp_header(conn, "location") == ["#{System.get_env("CLIENT_HOST")}/login/#{user.uuid}"]
     assert fetch_cookies(conn).cookies["session_id"] == "fdsnoafhnoofh08h38h"
   end
 
@@ -47,10 +48,11 @@ defmodule RebayApiWeb.SessionControllerTest do
   end
 
   test "handles errors", %{conn: conn} do
+    invalid_image = 0
     ueberauth_auth = %{
       credentials: %{token: "fdsnoafhnoofh08h38h"},
       info: %{
-        image: 0,
+        image: invalid_image,
         email: "travis@foo.fake", 
         first_name: "Travis", 
         provider: "google",
