@@ -4,11 +4,13 @@ defmodule RebayApiWeb.ItemController do
   alias RebayApi.Accounts
   alias RebayApi.Listings
   alias RebayApi.Listings.Item
+  alias RebayApi.Repo
 
   action_fallback RebayApiWeb.FallbackController
 
   plug RebayApiWeb.Plugs.AuthenticateSession when action in [:create, :update, :delete]
   plug RebayApiWeb.Plugs.AuthorizeUser when action in [:create, :update, :delete]
+  plug :authorize_change when action in [:update, :delete]
 
   def index(conn, _params) do
     items = Listings.list_items()
@@ -52,6 +54,22 @@ defmodule RebayApiWeb.ItemController do
 
     with {:ok, %Item{}} <- Listings.delete_item(item) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  defp authorize_change(conn, _params) do
+    user_uuid = conn.params["user_uuid"]
+    item = Listings.get_item!(conn.params["uuid"])
+    |> Repo.preload(:user)
+
+    if user_uuid == item.user.uuid do
+      conn
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> put_view(RebayApiWeb.ErrorView)
+      |> render("401.json")
+      |> halt()
     end
   end
 end
