@@ -5,6 +5,7 @@ defmodule RebayApi.ListingsTest do
 
   describe "items" do
     alias RebayApi.Listings.Item
+    alias RebayApi.TestHelpers
 
     @valid_attrs %{category: "some category", description: "some description", end_date: "2030-04-17T14:00:00Z", image: "http://www.some-image.foo", price: 1205, title: "some title", uuid: Ecto.UUID.generate()}
     @update_attrs %{category: "some updated category", description: "some updated description", end_date: "2030-05-18T15:01:01Z", image: "http://www.some-updated-image.foo", price: 4567, title: "some updated title"}
@@ -24,9 +25,13 @@ defmodule RebayApi.ListingsTest do
       assert Listings.list_items() == [item]
     end
 
-    test "get_item!/1 returns the item with given id" do
-      item = item_fixture()
-      assert Listings.get_item!(item.uuid) == item
+    test "get_items_by_user/1 returns the item for a given user uuid" do
+      user = TestHelpers.user_fixture()
+      user2 = TestHelpers.user_fixture()
+      item1 = item_fixture(%{ user_id: user.id })
+      item2 = item_fixture(%{ user_id: user.id })
+      item3 = item_fixture(%{ user_id: user2.id })
+      assert Listings.get_items_by_user(user.uuid) == [item1, item2]
     end
 
     test "create_item/1 with valid data creates a item" do
