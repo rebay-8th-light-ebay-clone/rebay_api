@@ -10,15 +10,17 @@ defmodule RebayApi.Listings do
 
   def get_item!(uuid), do: Repo.get_by!(Item, uuid: uuid)
 
+  def get_item_by_id!(id), do: Repo.get_by!(Item, id: id)
+
   def create_item(attrs \\ %{}) do
     %Item{}
-    |> Item.changeset(attrs)
+    |> Item.create_changeset(attrs)
     |> Repo.insert()
   end
 
   def update_item(%Item{} = item, attrs) do
     item
-    |> Item.changeset(attrs)
+    |> Item.update_changeset(attrs)
     |> Repo.update()
   end
 
@@ -27,6 +29,6 @@ defmodule RebayApi.Listings do
   end
 
   def change_item(%Item{} = item) do
-    Item.changeset(item, %{})
+    Item.shared_changeset(item, %{})
   end
 end

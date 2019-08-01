@@ -56,7 +56,17 @@ Use your new environment variables in your .circleci/config.yml file. For an exa
 
 Once created, environment variables are hidden and uneditable in the application. Changing an environment variable is only possible by deleting and recreating it.
 
-
+# Common Issues
 ### After Heroku Deployment, If you receive a `500 Internal Server Error`
 1. go to project directory and run `heroku run "POOL_SIZE=2 mix ecto.migrate"`
 2. If your database is empty, you can add your seeds by running `heroku run "POOL_SIZE=2 mix run priv/repo/seeds.exs"`
+
+### If your tests pass but the server returns "UUID IS NULL" errors
+It probably has to do with the seed data stored in your database.
+Drop your `rebay_api_dev` database either through terminal or pgadmin4.
+Then run:
+```
+mix ecto.create
+mix ecto.migrate
+mix run priv/repo/seeds.exs
+```

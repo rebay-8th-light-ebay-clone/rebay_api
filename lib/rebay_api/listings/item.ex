@@ -3,6 +3,7 @@ defmodule RebayApi.Listings.Item do
   import Ecto.Changeset
 
   alias RebayApi.Accounts.User
+  alias RebayApi.UserItem.Bid
 
   schema "items" do
     field :category, :string
@@ -13,16 +14,27 @@ defmodule RebayApi.Listings.Item do
     field :title, :string
     field :uuid, Ecto.UUID
     belongs_to :user, User
+    has_many :bids, Bid
 
     timestamps()
   end
 
-  def changeset(item, attrs) do
+  def update_changeset(item, attrs) do
+    shared_changeset(item, attrs)
+    |> forbid_price_update()
+    |> forbid_end_date_update()
+  end
+
+  def create_changeset(item, attrs) do
+    shared_changeset(item, attrs)
+    |> validate_end_date()
+    |> validate_price()
+  end
+
+  def shared_changeset(item, attrs) do
     item
     |> cast(attrs, [:title, :description, :image, :price, :category, :end_date, :uuid, :user_id])
     |> validate_required([:title, :description, :image, :price, :category, :end_date, :uuid])
-    |> validate_end_date()
-    |> validate_price()
   end
 
   def validate_end_date(changeset) do
@@ -45,6 +57,18 @@ defmodule RebayApi.Listings.Item do
         true -> 
           []
       end
+    end)
+  end
+
+  def forbid_price_update(changeset) do
+    validate_change(changeset, :price, fn :price, _price ->
+      [price: "cannot be modified"]
+    end)
+  end
+
+  def forbid_end_date_update(changeset) do
+    validate_change(changeset, :end_date, fn :end_date, _end_date ->
+      [end_date: "cannot be modified"]
     end)
   end
 end
