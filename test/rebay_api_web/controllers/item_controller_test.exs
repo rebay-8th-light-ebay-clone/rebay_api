@@ -4,7 +4,6 @@ defmodule RebayApiWeb.ItemControllerTest do
 
   alias RebayApi.Listings
   alias RebayApi.Listings.Item
-  alias RebayApi.Accounts.User
   alias RebayApi.TestHelpers
   alias RebayApi.Repo
 
@@ -119,7 +118,9 @@ defmodule RebayApiWeb.ItemControllerTest do
   describe "update item" do
     setup [:create_item, :create_user]
 
-    test "renders item when data is valid", %{conn: conn, item: %Item{uuid: uuid} = item, user: %User{uuid: user_uuid} = user} do
+    test "renders item when data is valid", %{conn: conn, item: %Item{uuid: uuid} = item} do
+      user = item.user
+      user_uuid = user.uuid
       conn = TestHelpers.valid_session(conn, user)
       |> put(Routes.user_item_path(conn, :update, user_uuid, uuid), @update_attrs)
 
@@ -153,9 +154,17 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "renders errors when data is invalid", %{conn: conn, item: item, user: user} do
-      conn = TestHelpers.valid_session(conn, user)
-      |> put(Routes.user_item_path(conn, :update, user.uuid, item.uuid), @invalid_attrs)
+    test "renders error when user is not the item owner", %{conn: conn, item: %Item{uuid: uuid}} do
+      unauthorized_user = TestHelpers.user_fixture()
+      conn = TestHelpers.valid_session(conn, unauthorized_user)
+      |> put(Routes.user_item_path(conn, :update, unauthorized_user.uuid, uuid), [item: @update_attrs, cookie: %{session_id: "test_id_token"}])
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "renders errors when data is invalid", %{conn: conn, item: item} do
+      conn = TestHelpers.valid_session(conn, item.user)
+      |> put(Routes.user_item_path(conn, :update, item.user.uuid, item.uuid), @invalid_attrs)
 
       assert json_response(conn, 422)["errors"] != %{}
     end
@@ -164,14 +173,14 @@ defmodule RebayApiWeb.ItemControllerTest do
   describe "delete item" do
     setup [:create_item, :create_user]
 
-    test "deletes chosen item", %{conn: conn, item: item, user: user} do
-      conn = TestHelpers.valid_session(conn, user)
-      |> delete(Routes.user_item_path(conn, :delete, user.uuid, item.uuid))
+    test "deletes chosen item", %{conn: conn, item: item} do
+      conn = TestHelpers.valid_session(conn, item.user)
+      |> delete(Routes.user_item_path(conn, :delete, item.user.uuid, item.uuid))
 
       assert response(conn, 204)
 
       assert_error_sent 404, fn ->
-        get(conn, Routes.user_item_path(conn, :show, user.uuid, item.uuid))
+        get(conn, Routes.user_item_path(conn, :show, item.user.uuid, item.uuid))
       end
     end
 
