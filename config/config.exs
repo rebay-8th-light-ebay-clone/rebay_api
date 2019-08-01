@@ -8,7 +8,8 @@
 use Mix.Config
 
 config :rebay_api,
-  ecto_repos: [RebayApi.Repo]
+  ecto_repos: [RebayApi.Repo],
+  client_host: System.get_env("CLIENT_HOST")
 
 # Configures the endpoint
 config :rebay_api, RebayApiWeb.Endpoint,

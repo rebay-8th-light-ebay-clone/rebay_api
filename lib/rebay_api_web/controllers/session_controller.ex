@@ -14,8 +14,8 @@ defmodule RebayApiWeb.SessionController do
         conn
         |> put_session(:id, auth.credentials.token)
         |> put_session(:user_uuid, user.uuid)
-        |> put_resp_cookie("session_id", auth.credentials.token, [http_only: true, secure: false])
-        |> redirect(external: "#{System.get_env("CLIENT_HOST")}/login/#{user.uuid}")
+        |> put_resp_cookie("session_id", auth.credentials.token, [http_only: true])
+        |> redirect(external: "#{Application.get_env(:rebay_api, :client_host)}/login/#{user.uuid}")
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_view(RebayApiWeb.ChangesetView)
