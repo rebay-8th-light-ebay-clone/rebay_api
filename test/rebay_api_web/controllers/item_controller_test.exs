@@ -215,6 +215,21 @@ defmodule RebayApiWeb.ItemControllerTest do
 
       assert json_response(conn, 401)["errors"] != %{}
     end
+
+    test "renders error when user is not authorized", %{conn: conn, item: item, user: user} do
+      conn = TestHelpers.valid_session(conn, user)
+      |> delete(Routes.user_item_path(conn, :delete, item.user.uuid, item.uuid), [cookie: %{session_id: "test_id_token"}])
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "renders error when user is not the item owner", %{conn: conn, item: %Item{uuid: uuid}} do
+      unauthorized_user = TestHelpers.user_fixture()
+      conn = TestHelpers.valid_session(conn, unauthorized_user)
+      |> put(Routes.user_item_path(conn, :delete, unauthorized_user.uuid, uuid), [cookie: %{session_id: "test_id_token"}])
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
   end
 
   defp create_item(_) do
