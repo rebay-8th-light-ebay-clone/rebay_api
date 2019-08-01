@@ -30,7 +30,7 @@ defmodule RebayApi.ListingsTest do
       user2 = TestHelpers.user_fixture()
       item1 = item_fixture(%{ user_id: user.id })
       item2 = item_fixture(%{ user_id: user.id })
-      item3 = item_fixture(%{ user_id: user2.id })
+      _item3 = item_fixture(%{ user_id: user2.id })
       assert Listings.get_items_by_user(user.uuid) == [item1, item2]
     end
 
