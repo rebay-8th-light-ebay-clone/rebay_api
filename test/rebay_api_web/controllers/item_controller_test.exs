@@ -4,6 +4,7 @@ defmodule RebayApiWeb.ItemControllerTest do
 
   alias RebayApi.Listings
   alias RebayApi.Listings.Item
+  alias RebayApi.Accounts
   alias RebayApi.TestHelpers
   alias RebayApi.Repo
 
@@ -38,6 +39,30 @@ defmodule RebayApiWeb.ItemControllerTest do
   describe "index" do
     test "lists all items", %{conn: conn} do
       conn = get(conn, Routes.item_path(conn, :index))
+      assert json_response(conn, 200)["data"] == []
+    end
+  end
+
+  describe "index by user" do
+    setup [:create_item]
+    test "lists all items for a user", %{conn: conn, item: item} do
+      user = Accounts.get_user_by_id!(item.user_id)
+      conn = get(conn, Routes.user_item_path(conn, :index_by_user, user.uuid))
+      assert json_response(conn, 200)["data"] == [%{
+        "category" => "some category",
+        "description" => "some description",
+        "end_date" => "2030-07-31T06:59:59Z",
+        "image" => "http://www.some-image.foo",
+        "price" => 1205,
+        "title" => "some title",
+        "user_uuid" => user.uuid,
+        "uuid" => @uuid
+      }]
+    end
+
+    test "return empty is user has no items", %{conn: conn} do
+      user = TestHelpers.user_fixture()
+      conn = get(conn, Routes.user_item_path(conn, :index_by_user, user.uuid))
       assert json_response(conn, 200)["data"] == []
     end
   end
