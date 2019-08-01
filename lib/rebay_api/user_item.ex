@@ -11,7 +11,7 @@ defmodule RebayApi.UserItem do
 
   def list_bids_by_item(item_uuid) do
     bidItem = Listings.get_item!(item_uuid)
-    query = from bid in Bid, where: ^bidItem.uuid == ^item_uuid
+    query = from bid in Bid, where: ^bidItem.id == bid.item_id
     Repo.all(query, preload: [:item])
   end
 
