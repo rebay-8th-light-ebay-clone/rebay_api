@@ -56,7 +56,8 @@ defmodule RebayApiWeb.ItemControllerTest do
         "price" => 1205,
         "title" => "some title",
         "user_uuid" => user.uuid,
-        "uuid" => @uuid
+        "uuid" => @uuid,
+        "current_highest_bid" => 1205
       }]
     end
 
@@ -79,7 +80,8 @@ defmodule RebayApiWeb.ItemControllerTest do
         "price" => 1205,
         "title" => "some title",
         "uuid" => @uuid,
-        "user_uuid" => item.user.uuid
+        "user_uuid" => item.user.uuid,
+        "current_highest_bid" => 1205
       }
     end
   end
@@ -102,6 +104,7 @@ defmodule RebayApiWeb.ItemControllerTest do
                "price" => 1205,
                "title" => "some title",
                "uuid" => uuid,
+              "current_highest_bid" => 1205
              } = json_response(conn, 200)["data"]
     end
 
@@ -162,6 +165,7 @@ defmodule RebayApiWeb.ItemControllerTest do
                "title" => "some updated title",
                "user_uuid" => user_uuid,
                "uuid" => uuid,
+               "current_highest_bid" => 1205
              } = json_response(conn, 200)["data"]
     end
 
