@@ -9,12 +9,19 @@ defmodule RebayApi.UserItemTest do
     @uuid Ecto.UUID.generate()
     @user_uuid Ecto.UUID.generate()
     @valid_attrs %{bid_price: 42, uuid: @uuid}
-    @invalid_attrs %{bid_price: nil}
+    @invalid_attrs %{bid_price: nil, item_id: nil, user_id: nil, uuid: nil}
 
     def bid_fixture(attrs \\ %{}) do
+      user = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: user.id})
+      bidding_user = TestHelpers.user_fixture()
+      create_attrs = @valid_attrs
+      |> Map.put(:user_id, bidding_user.id)
+      |> Map.put(:item_id, item.id)
+
       {:ok, bid} =
         attrs
-        |> Enum.into(@valid_attrs)
+        |> Enum.into(create_attrs)
         |> UserItem.create_bid()
 
       bid
@@ -66,12 +73,35 @@ defmodule RebayApi.UserItemTest do
     end
 
     test "create_bid/1 with valid data creates a bid" do
-      assert {:ok, %Bid{} = bid} = UserItem.create_bid(@valid_attrs)
+      assert bid = bid_fixture()
       assert bid.bid_price == 42
     end
 
     test "create_bid/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = UserItem.create_bid(@invalid_attrs)
+    end
+
+    test "create_bid/1 with invalid price returns error changeset" do
+      bid = bid_fixture()
+      initial_bid = Repo.get_by!(Bid, uuid: bid.uuid)
+      |> Repo.preload(:user)
+      |> Repo.preload(:item)
+      
+      user = initial_bid.user
+      item = initial_bid.item
+      
+      UserItem.create_bid(%{bid_price: 43, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 44, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 45, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+
+      invalid_create_attrs = %{
+        bid_price: 45, 
+        item_id: item.id, 
+        user_id: user.id,
+        uuid: Ecto.UUID.generate()
+      }
+
+      assert {:error, %Ecto.Changeset{}} = UserItem.create_bid(invalid_create_attrs)
     end
 
     test "change_bid/1 returns a bid changeset" do
