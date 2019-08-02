@@ -6,12 +6,13 @@ defmodule RebayApiWeb.BidControllerTest do
   alias RebayApi.UserItem.Bid
   alias RebayApi.TestHelpers
   alias RebayApi.Listings
+  alias RebayApi.Accounts
   alias RebayApi.Repo
 
   @uuid Ecto.UUID.generate()
   @user_uuid Ecto.UUID.generate()
   @item_uuid Ecto.UUID.generate()
-  @invalid_attrs %{bid_price: nil}
+  @invalid_attrs %{bid_price: nil, user_id: nil, item_id: nil, uuid: nil}
 
   def create_bid_attrs() do
     user = TestHelpers.user_fixture(%{ uuid: @user_uuid })
@@ -96,25 +97,55 @@ defmodule RebayApiWeb.BidControllerTest do
 
   describe "create bid" do
     test "renders bid when data is valid", %{conn: conn} do
+      item_owner = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: item_owner.id, uuid: Ecto.UUID.generate()})
+      item_uuid = item.uuid
       user = TestHelpers.user_fixture()
+      _user_uuid = user.uuid
+
       conn = conn
       |> TestHelpers.valid_session(user)
-      |> post(Routes.item_bid_path(conn, :create, @item_uuid), bid: create_bid_attrs())
+      |> post(Routes.item_bid_path(conn, :create, item_uuid), %{bid_price: 100})
       assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
 
-      conn = get(conn, Routes.item_bid_path(conn, :show, 1, uuid))
+      conn = get(conn, Routes.item_bid_path(conn, :show, item_uuid, uuid))
 
       assert %{
-               "uuid" => uuid,
-               "bid_price" => 42
+              "bid_price" => 100,
+              "uuid" => uuid,
+              "user_uuid" => user_uuid,
+              "item_uuid" => item_uuid       
              } = json_response(conn, 200)["data"]
+    end
+
+    test "associates bid with the correct user and item", %{conn: conn} do
+      user = TestHelpers.user_fixture()
+      item_owner = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: item_owner.id, uuid: Ecto.UUID.generate()})
+      user_uuid = user.uuid
+      item_uuid = item.uuid
+
+      conn
+      |> TestHelpers.valid_session(user)
+      |> post(Routes.item_bid_path(conn, :create, item.uuid), %{bid_price: 100})
+
+      expected_user = Accounts.get_user!(user_uuid)
+      |> Repo.preload(:bids)
+      
+      expected_item = Listings.get_item!(item_uuid)
+      |> Repo.preload(:bids)
+      
+      assert length(expected_user.bids) == 1
+      assert length(expected_item.bids) == 1
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       user = TestHelpers.user_fixture()
+      item_owner = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: item_owner.id})
       conn = conn
       |> TestHelpers.valid_session(user)
-      |> post(Routes.item_bid_path(conn, :create, @item_uuid), bid: @invalid_attrs)
+      |> post(Routes.item_bid_path(conn, :create, item.uuid), @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
 

@@ -3,6 +3,7 @@ defmodule RebayApiWeb.BidController do
 
   alias RebayApi.UserItem
   alias RebayApi.UserItem.Bid
+  alias RebayApi.Listings
 
   action_fallback RebayApiWeb.FallbackController
 
@@ -19,16 +20,24 @@ defmodule RebayApiWeb.BidController do
     render(conn, "index_by_user.json", bids: bids)
   end
 
-  def create(conn, %{"bid" => bid_params, "item_uuid" => item_uuid}) do
+  def create(conn, params) do
+    item = Listings.get_item!(params["item_uuid"])
+    user = conn.assigns[:user]
+
+    bid_params = params
+    |> Map.put("user_id", user.id)
+    |> Map.put("item_id", item.id)
+    |> Map.put("uuid", Ecto.UUID.generate())
+
     with {:ok, %Bid{} = bid} <- UserItem.create_bid(bid_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.item_bid_path(conn, :show, item_uuid, bid))
+      |> put_resp_header("location", Routes.item_bid_path(conn, :show, item.uuid, bid))
       |> render("show.json", bid: bid)
     end
   end
 
-  def show(conn, %{"uuid" => uuid}) do
+  def show(conn, %{"item_uuid" => item_uuid, "uuid" => uuid}) do
     bid = UserItem.get_bid!(uuid)
     render(conn, "show.json", bid: bid)
   end
