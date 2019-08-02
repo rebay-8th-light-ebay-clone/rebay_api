@@ -53,11 +53,17 @@ defmodule RebayApi.TestHelpers do
   end
 
   def bid_fixture(attrs \\ %{}) do
+    user = user_fixture()
+    item = item_fixture(%{user_id: user.id})
+    bidding_user = user_fixture()
+
     params =
       attrs
       |> Enum.into(%{
         bid_price: 42,
         uuid: Ecto.UUID.generate(),
+        user_id: bidding_user.id,
+        item_id: item.id
       })
 
     {:ok, bid} =
