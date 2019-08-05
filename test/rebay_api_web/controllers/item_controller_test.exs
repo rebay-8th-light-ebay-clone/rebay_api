@@ -56,7 +56,8 @@ defmodule RebayApiWeb.ItemControllerTest do
         "price" => 1205,
         "title" => "some title",
         "user_uuid" => user.uuid,
-        "uuid" => @uuid
+        "uuid" => @uuid,
+        "current_highest_bid" => 1205
       }]
     end
 
@@ -79,7 +80,8 @@ defmodule RebayApiWeb.ItemControllerTest do
         "price" => 1205,
         "title" => "some title",
         "uuid" => @uuid,
-        "user_uuid" => item.user.uuid
+        "user_uuid" => item.user.uuid,
+        "current_highest_bid" => 1205
       }
     end
   end
@@ -102,6 +104,7 @@ defmodule RebayApiWeb.ItemControllerTest do
                "price" => 1205,
                "title" => "some title",
                "uuid" => uuid,
+              "current_highest_bid" => 1205
              } = json_response(conn, 200)["data"]
     end
 
@@ -162,6 +165,7 @@ defmodule RebayApiWeb.ItemControllerTest do
                "title" => "some updated title",
                "user_uuid" => user_uuid,
                "uuid" => uuid,
+               "current_highest_bid" => 1205
              } = json_response(conn, 200)["data"]
     end
 
@@ -172,7 +176,7 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "renders error when user is loggid in but not authorized", %{conn: conn, item: item, user: user} do
+    test "renders error when user is logged in but not authorized", %{conn: conn, item: item, user: user} do
       conn = TestHelpers.valid_session(conn, user)
       |> put(Routes.user_item_path(conn, :update, item.user.uuid, item.uuid), [item: @update_attrs, cookie: %{session_id: "test_id_token"}])
 
@@ -216,14 +220,14 @@ defmodule RebayApiWeb.ItemControllerTest do
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "renders error when user is not authorized", %{conn: conn, item: item, user: user} do
+    test "renders error when user is logged in but not authorized", %{conn: conn, item: item, user: user} do
       conn = TestHelpers.valid_session(conn, user)
       |> delete(Routes.user_item_path(conn, :delete, item.user.uuid, item.uuid), [cookie: %{session_id: "test_id_token"}])
 
       assert json_response(conn, 403)["errors"] != %{}
     end
 
-    test "renders error when user is not the item owner", %{conn: conn, item: %Item{uuid: uuid}} do
+    test "renders error when user is logged in but not the item owner", %{conn: conn, item: %Item{uuid: uuid}} do
       unauthorized_user = TestHelpers.user_fixture()
       conn = TestHelpers.valid_session(conn, unauthorized_user)
       |> put(Routes.user_item_path(conn, :delete, unauthorized_user.uuid, uuid), [cookie: %{session_id: "test_id_token"}])

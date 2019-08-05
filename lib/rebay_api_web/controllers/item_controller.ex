@@ -36,7 +36,7 @@ defmodule RebayApiWeb.ItemController do
     end
   end
 
-  def show(conn, %{"uuid" => uuid, "user_uuid" => _user_uuid}) do
+  def show(conn, %{"uuid" => uuid}) do
     item = Listings.get_item!(uuid)
     render(conn, "show.json", item: item)
   end
@@ -49,7 +49,7 @@ defmodule RebayApiWeb.ItemController do
     end
   end
 
-  def delete(conn, %{"uuid" => uuid, "user_uuid" => _user_uuid}) do
+  def delete(conn, %{"uuid" => uuid}) do
     item = Listings.get_item!(uuid)
 
     with {:ok, %Item{}} <- Listings.delete_item(item) do

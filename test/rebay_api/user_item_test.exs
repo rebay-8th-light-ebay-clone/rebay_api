@@ -7,6 +7,8 @@ defmodule RebayApi.UserItemTest do
 
   describe "bids" do
     @user_uuid Ecto.UUID.generate()
+    @item_uuid Ecto.UUID.generate()
+    @item_id 10
     @invalid_attrs %{bid_price: nil, item_id: nil, user_id: nil, uuid: nil}
 
     def many_bids_fixture() do
@@ -14,7 +16,9 @@ defmodule RebayApi.UserItemTest do
       item1 = TestHelpers.item_fixture(%{
         title: "item 1 title",
         user_id: user.id,
-        end_date: "2020-08-31T06:59:59Z"
+        end_date: "2020-08-31T06:59:59Z",
+        uuid: @item_uuid,
+        id: @item_id
       })
       item2 = TestHelpers.item_fixture(%{
         title: "item 2 title",
@@ -44,6 +48,17 @@ defmodule RebayApi.UserItemTest do
       [bid1, bid2, bid3, bid4]
     end
 
+    test "get_highest_bid/1 returns max bid number" do
+      user = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: user.id})
+
+      UserItem.create_bid(%{bid_price: 43, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 44, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 45, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      highestBid = UserItem.get_highest_bid(item.id);
+      assert highestBid == 45
+    end
+
     test "list_bids/0 returns all bids" do
       bid = TestHelpers.bid_fixture()
       assert UserItem.list_bids() == [bid]
@@ -68,17 +83,17 @@ defmodule RebayApi.UserItemTest do
       initial_bid = Repo.get_by!(Bid, uuid: bid.uuid)
       |> Repo.preload(:user)
       |> Repo.preload(:item)
-      
+
       user = initial_bid.user
       item = initial_bid.item
-      
+
       UserItem.create_bid(%{bid_price: 43, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
       UserItem.create_bid(%{bid_price: 44, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
       UserItem.create_bid(%{bid_price: 45, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
 
       invalid_create_attrs = %{
-        bid_price: 45, 
-        item_id: item.id, 
+        bid_price: 45,
+        item_id: item.id,
         user_id: user.id,
         uuid: Ecto.UUID.generate()
       }
@@ -89,10 +104,10 @@ defmodule RebayApi.UserItemTest do
     test "create_bid/1 with invalid date returns error changeset" do
       user = TestHelpers.user_fixture()
       item = TestHelpers.item_fixture(%{user_id: user.id, end_date: "2020-07-31T06:59:59.000Z"})
-      
+
       invalid_create_attrs = %{
-        bid_price: 42, 
-        item_id: item.id, 
+        bid_price: 42,
+        item_id: item.id,
         user_id: user.id,
         uuid: Ecto.UUID.generate(),
         timestamp: "2020-08-31T06:59:59.000Z"
