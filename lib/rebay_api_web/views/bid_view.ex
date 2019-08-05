@@ -3,6 +3,7 @@ defmodule RebayApiWeb.BidView do
   alias RebayApiWeb.BidView
   alias RebayApi.Repo
   alias RebayApi.UserItem
+  alias RebayApi.Listings.Item
   alias RebayApiWeb.ItemView
 
   def render("index_by_item.json", %{bids: bids}) do
@@ -24,7 +25,8 @@ defmodule RebayApiWeb.BidView do
       uuid: bid.uuid,
       item_uuid: item_uuid,
       user_uuid: user_uuid,
-      timestamp: bid.inserted_at
+      timestamp: bid.inserted_at,
+      winner: is_winner(bid)
     }
   end
 
@@ -41,5 +43,13 @@ defmodule RebayApiWeb.BidView do
       "item_uuid" => bid.item.uuid,
       "user_uuid" => bid.user.uuid
     }
+  end
+
+  defp is_winner(bid) do
+    item = Repo.get!(Item, bid.item_id)
+    {:ok, current_date} = DateTime.now("Etc/UTC")
+    has_ended = DateTime.compare(item.end_date, current_date) == :lt
+    highest_bid_price = UserItem.get_highest_bid(item.id)
+    has_ended && bid.bid_price == highest_bid_price
   end
 end
