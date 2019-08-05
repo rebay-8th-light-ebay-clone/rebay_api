@@ -14,6 +14,10 @@ defmodule RebayApi.TestHelpers do
     |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
   end
 
+  def invalid_session(conn, id_token) do
+    init_test_session(conn, id: id_token)
+  end
+
   def user_fixture(attrs \\ %{}) do
     params =
       attrs

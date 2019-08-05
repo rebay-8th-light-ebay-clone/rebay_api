@@ -75,7 +75,7 @@ defmodule RebayApiWeb.BidControllerTest do
     end
 
     test "returns error when user is logged in but request is not authenticated", %{conn: conn, bid: bid} do
-      conn = init_test_session(conn, id: "test_id_token")
+      conn = TestHelpers.invalid_session(conn, "test_id_token")
       |> get(Routes.user_bid_path(conn, :index_by_user, bid.user.uuid))
 
       assert json_response(conn, 401)["errors"] != %{}
@@ -91,7 +91,7 @@ defmodule RebayApiWeb.BidControllerTest do
       conn = TestHelpers.valid_session(conn, bid.user)
       |> get(Routes.user_bid_path(conn, :index_by_user, Ecto.UUID.generate()))
 
-      assert json_response(conn, 401)["errors"] != %{}
+      assert json_response(conn, 403)["errors"] != %{}
     end
   end
 
@@ -151,7 +151,7 @@ defmodule RebayApiWeb.BidControllerTest do
 
     test "returns error when user is logged in but request is not authenticated", %{conn: conn} do
       item = TestHelpers.item_fixture
-      conn = init_test_session(conn, id: "test_id_token")
+      conn = TestHelpers.invalid_session(conn, "test_id_token")
       |> post(Routes.item_bid_path(conn, :create, item.uuid), bid: create_bid_attrs())
 
       assert json_response(conn, 401)["errors"] != %{}

@@ -37,7 +37,7 @@ defmodule RebayApiWeb.BidController do
     end
   end
 
-  def show(conn, %{"item_uuid" => item_uuid, "uuid" => uuid}) do
+  def show(conn, %{"uuid" => uuid}) do
     bid = UserItem.get_bid!(uuid)
     render(conn, "show.json", bid: bid)
   end
