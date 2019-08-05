@@ -13,7 +13,7 @@ defmodule RebayApi.UserItem do
   def get_highest_bid(item_id) do
     query = from bid in Bid, where: ^item_id == bid.item_id, order_by: [desc: bid.bid_price], limit: 1
     bid = Repo.one(query)
-    if (bid), do: bid.bid_price, else: Repo.get!(Item, item_id).price
+    if (bid), do: bid.bid_price
   end
 
   def list_bids_by_item(item_uuid) do

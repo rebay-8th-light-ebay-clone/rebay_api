@@ -58,6 +58,14 @@ defmodule RebayApi.UserItemTest do
       highestBid = UserItem.get_highest_bid(item.id);
       assert highestBid == 45
     end
+    
+    test "get_highest_bid/1 returns nil when there are no bids" do
+      user = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: user.id})
+  
+      highestBid = UserItem.get_highest_bid(item.id);
+      assert highestBid == nil
+    end
 
     test "list_bids/0 returns all bids" do
       bid = TestHelpers.bid_fixture()
