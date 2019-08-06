@@ -114,7 +114,7 @@ defmodule RebayApiWeb.BidControllerTest do
               "bid_price" => 100,
               "uuid" => uuid,
               "user_uuid" => user_uuid,
-              "item_uuid" => item_uuid       
+              "item_uuid" => item_uuid
              } = json_response(conn, 200)["data"]
     end
 
@@ -131,10 +131,10 @@ defmodule RebayApiWeb.BidControllerTest do
 
       expected_user = Accounts.get_user!(user_uuid)
       |> Repo.preload(:bids)
-      
+
       expected_item = Listings.get_item!(item_uuid)
       |> Repo.preload(:bids)
-      
+
       assert length(expected_user.bids) == 1
       assert length(expected_item.bids) == 1
     end
@@ -155,6 +155,16 @@ defmodule RebayApiWeb.BidControllerTest do
       |> post(Routes.item_bid_path(conn, :create, item.uuid), bid: create_bid_attrs())
 
       assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "returns error when user tries to bid on their own item", %{conn: conn} do
+      user = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{ user_id: user.id })
+      conn = conn
+      |> TestHelpers.valid_session(user)
+      |> post(Routes.item_bid_path(conn, :create, item.uuid), %{bid_price: 100})
+
+      assert json_response(conn, 403)["errors"] != %{}
     end
 
     test "renders error when user is not logged in", %{conn: conn} do
