@@ -26,7 +26,8 @@ defmodule RebayApiWeb.BidView do
       item_uuid: item_uuid,
       user_uuid: user_uuid,
       timestamp: bid.inserted_at,
-      winner: is_winner(bid)
+      winner: is_winner(bid),
+      max_bid_price: bid.max_bid_price
     }
   end
 

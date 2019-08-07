@@ -118,6 +118,29 @@ defmodule RebayApiWeb.BidControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
+    test "renders bid with max bid price when data is valid", %{conn: conn} do
+      item_owner = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: item_owner.id, uuid: Ecto.UUID.generate()})
+      item_uuid = item.uuid
+      user = TestHelpers.user_fixture()
+      _user_uuid = user.uuid
+
+      conn = conn
+      |> TestHelpers.valid_session(user)
+      |> post(Routes.item_bid_path(conn, :create, item_uuid), %{bid_price: 100, max_bid_price: 200 })
+      assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
+
+      conn = get(conn, Routes.item_bid_path(conn, :show, item_uuid, uuid))
+
+      assert %{
+              "bid_price" => 100,
+              "uuid" => uuid,
+              "user_uuid" => user_uuid,
+              "item_uuid" => item_uuid,
+              "max_bid_price" => 200
+             } = json_response(conn, 200)["data"]
+    end
+
     test "associates bid with the correct user and item", %{conn: conn} do
       user = TestHelpers.user_fixture()
       item_owner = TestHelpers.user_fixture()
@@ -147,6 +170,16 @@ defmodule RebayApiWeb.BidControllerTest do
       |> TestHelpers.valid_session(user)
       |> post(Routes.item_bid_path(conn, :create, item.uuid), @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "renders error when max bid price is lower than or equal to price", %{conn: conn} do
+      user = TestHelpers.user_fixture()
+      item_owner = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: item_owner.id})
+      conn = conn
+      |> TestHelpers.valid_session(user)
+      |> post(Routes.item_bid_path(conn, :create, item.uuid), %{bid_price: 100, max_bid_price: 100 })
+      assert json_response(conn, 422)["errors"] == %{"bid_price" => ["max bid price must be greater than minimum price"]}
     end
 
     test "returns error when user is logged in but request is not authenticated", %{conn: conn} do
