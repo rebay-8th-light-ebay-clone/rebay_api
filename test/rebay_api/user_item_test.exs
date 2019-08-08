@@ -48,23 +48,48 @@ defmodule RebayApi.UserItemTest do
       [bid1, bid2, bid3, bid4]
     end
 
-    test "get_highest_bid/1 returns max bid number" do
+    test "get_highest_bid_price/1 returns max bid number" do
       user = TestHelpers.user_fixture()
       item = TestHelpers.item_fixture(%{user_id: user.id})
 
       UserItem.create_bid(%{bid_price: 43, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
       UserItem.create_bid(%{bid_price: 44, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
       UserItem.create_bid(%{bid_price: 45, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
-      highestBid = UserItem.get_highest_bid(item.id);
+      highestBid = UserItem.get_highest_bid_price(item.id);
       assert highestBid == 45
     end
-    
-    test "get_highest_bid/1 returns nil when there are no bids" do
+
+    test "get_highest_bid_price/1 returns nil when there are no bids" do
       user = TestHelpers.user_fixture()
       item = TestHelpers.item_fixture(%{user_id: user.id})
-  
-      highestBid = UserItem.get_highest_bid(item.id);
+
+      highestBid = UserItem.get_highest_bid_price(item.id);
       assert highestBid == nil
+    end
+
+    test "get_highest_bidder_user_id/1 returns max bid number" do
+      user = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: user.id})
+
+      UserItem.create_bid(%{bid_price: 43, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 44, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 45, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      user_id = UserItem.get_highest_bidder_user_id(item.id);
+      assert user_id == user.id
+    end
+
+    test "get_auto_bids_by_item/1 returns the current auto bids for a given item uuid" do
+      item = TestHelpers.item_fixture(%{ price: 100 })
+      _bid1 = TestHelpers.bid_fixture(%{ max_bid_price: 500, bid_price: 200, item_id: item.id })
+      bid2 = TestHelpers.bid_fixture(%{ max_bid_price: 700, bid_price: 300, item_id: item.id })
+      _bid3 = TestHelpers.bid_fixture(%{ max_bid_price: 500, bid_price: 400, item_id: item.id })
+      _bid4 = TestHelpers.bid_fixture(%{ bid_price: 500, item_id: item.id })
+      bid5 = TestHelpers.bid_fixture(%{ max_bid_price: 800, bid_price: 600, item_id: item.id })
+
+      item2 = TestHelpers.item_fixture()
+      _bid6 = TestHelpers.bid_fixture(%{ max_bid_price: 30, bid_price: 25, item_id: item2.id })
+
+      assert UserItem.get_auto_bids_by_item(item.id) == [bid2, bid5]
     end
 
     test "list_bids/0 returns all bids" do

@@ -3,12 +3,12 @@ defmodule RebayApiWeb.SessionControllerTest do
   alias RebayApi.Repo
   alias RebayApi.Accounts.User
   alias RebayApi.TestHelpers
-  
+
   test "redirects user to Google for authentication", %{conn: conn} do
     conn = get conn, "/auth/google?scope=email%20profile"
     assert redirected_to(conn, 302)
   end
-  
+
   test "creates user from Google information", %{conn: conn} do
     users = User |> Repo.all
     assert Enum.count(users) == 0
@@ -17,8 +17,8 @@ defmodule RebayApiWeb.SessionControllerTest do
       credentials: %{token: "fdsnoafhnoofh08h38h"},
       info: %{
         image: "some-image-url.foo",
-        email: "travis@foo.fake", 
-        first_name: "Travis", 
+        email: "travis@foo.fake",
+        first_name: "Travis",
         provider: "google",
         token: "foo",
         },
@@ -30,7 +30,7 @@ defmodule RebayApiWeb.SessionControllerTest do
 
     users = User |> Repo.all
     [ user | _ ] = users
-    
+
     assert Enum.count(users) == 1
     assert get_resp_header(conn, "location") == ["#{Application.get_env(:rebay_api, :client_host)}/login/#{user.uuid}"]
     assert fetch_cookies(conn).cookies["session_id"] == "fdsnoafhnoofh08h38h"
@@ -53,8 +53,8 @@ defmodule RebayApiWeb.SessionControllerTest do
       credentials: %{token: "fdsnoafhnoofh08h38h"},
       info: %{
         image: invalid_image,
-        email: "travis@foo.fake", 
-        first_name: "Travis", 
+        email: "travis@foo.fake",
+        first_name: "Travis",
         provider: "google",
         token: "foo",
         },

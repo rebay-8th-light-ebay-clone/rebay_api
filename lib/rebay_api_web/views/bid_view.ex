@@ -50,7 +50,7 @@ defmodule RebayApiWeb.BidView do
     item = Repo.get!(Item, bid.item_id)
     {:ok, current_date} = DateTime.now("Etc/UTC")
     has_ended = DateTime.compare(item.end_date, current_date) == :lt
-    highest_bid_price = UserItem.get_highest_bid(item.id)
+    highest_bid_price = UserItem.get_highest_bid_price(item.id)
     has_ended && bid.bid_price == highest_bid_price
   end
 end

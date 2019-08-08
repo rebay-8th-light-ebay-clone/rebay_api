@@ -208,6 +208,69 @@ defmodule RebayApiWeb.BidControllerTest do
     end
   end
 
+  describe "auto bids" do
+    test "triggers auto bids after a new bid creation", %{conn: conn} do
+      item_owner = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: item_owner.id, price: 100})
+      user1 = TestHelpers.user_fixture()
+      user2 = TestHelpers.user_fixture()
+      user3 = TestHelpers.user_fixture()
+      bid_uuid = Ecto.UUID.generate()
+      item_owner_uuid = item_owner.uuid
+      item_uuid = item.uuid
+      TestHelpers.bid_fixture(%{ max_bid_price: 700, bid_price: 200, item_id: item.id, user_id: user1.id })
+      TestHelpers.bid_fixture(%{ max_bid_price: 900, bid_price: 300, item_id: item.id, user_id: user2.id })
+
+      conn = conn
+      |> TestHelpers.valid_session(user3)
+      |> post(Routes.item_bid_path(conn, :create, item.uuid), %{ bid_price: 400, uuid: bid_uuid })
+      assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
+
+      conn = get(conn, Routes.user_item_path(conn, :show, item_owner_uuid, item_uuid))
+      assert %{
+        "category" => "some category",
+        "current_highest_bid" => 800,
+        "description" => "some description",
+        "end_date" => "2020-07-31T06:59:59Z",
+        "image" => "some image",
+        "price" => 100,
+        "title" => "some title",
+        "user_uuid" => item_owner_uuid,
+        "uuid" => item_uuid
+      } == json_response(conn, 200)["data"]
+    end
+
+    test "does not trigger bidding users auto bids after a new bid creation", %{conn: conn} do
+      item_owner = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: item_owner.id, price: 100})
+      user1 = TestHelpers.user_fixture()
+      user2 = TestHelpers.user_fixture()
+      bid_uuid = Ecto.UUID.generate()
+      item_owner_uuid = item_owner.uuid
+      item_uuid = item.uuid
+      TestHelpers.bid_fixture(%{ max_bid_price: 600, bid_price: 200, item_id: item.id, user_id: user1.id })
+      TestHelpers.bid_fixture(%{ max_bid_price: 700, bid_price: 300, item_id: item.id, user_id: user2.id })
+
+      conn = conn
+      |> TestHelpers.valid_session(user1)
+      |> post(Routes.item_bid_path(conn, :create, item.uuid), %{ bid_price: 400, uuid: bid_uuid })
+      assert %{"uuid" => uuid} = json_response(conn, 201)["data"]
+
+      conn = get(conn, Routes.user_item_path(conn, :show, item_owner_uuid, item_uuid))
+      assert %{
+        "category" => "some category",
+        "current_highest_bid" => 700,
+        "description" => "some description",
+        "end_date" => "2020-07-31T06:59:59Z",
+        "image" => "some image",
+        "price" => 100,
+        "title" => "some title",
+        "user_uuid" => item_owner_uuid,
+        "uuid" => item_uuid
+      } == json_response(conn, 200)["data"]
+    end
+  end
+
   defp create_bid(_) do
     bid = fixture(:bid)
     bid = Bid
