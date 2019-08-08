@@ -40,6 +40,6 @@ defmodule RebayApiWeb.ItemView do
     item = Item
     |> Repo.get_by!(uuid: item_uuid)
 
-    UserItem.get_highest_bid(item.id)
+    UserItem.get_highest_bid_price(item.id)
   end
 end

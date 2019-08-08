@@ -42,8 +42,8 @@ defmodule RebayApi.Listings.Item do
       {:ok, current_date} = DateTime.now("Etc/UTC")
       case DateTime.compare(end_date, current_date) do
         :lt ->
-          [end_date: "cannot be in the past"]
-        _ -> 
+          [end_date: "end date cannot be in the past"]
+        _ ->
           []
       end
     end)
@@ -53,8 +53,8 @@ defmodule RebayApi.Listings.Item do
     validate_change(changeset, :price, fn :price, price ->
       cond do
         price < 100 ->
-          [price: "cannot be less than $1"]
-        true -> 
+          [price: "price cannot be less than $1"]
+        true ->
           []
       end
     end)
@@ -62,13 +62,13 @@ defmodule RebayApi.Listings.Item do
 
   defp forbid_price_update(changeset) do
     validate_change(changeset, :price, fn :price, _price ->
-      [price: "cannot be modified"]
+      [price: "price cannot be modified"]
     end)
   end
 
   defp forbid_end_date_update(changeset) do
     validate_change(changeset, :end_date, fn :end_date, _end_date ->
-      [end_date: "cannot be modified"]
+      [end_date: "end date cannot be modified"]
     end)
   end
 end

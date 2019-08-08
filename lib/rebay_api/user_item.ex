@@ -4,16 +4,24 @@ defmodule RebayApi.UserItem do
   alias RebayApi.UserItem.Bid
   alias RebayApi.Listings
   alias RebayApi.Accounts
-  alias RebayApi.Listings.Item
 
   def list_bids do
     Repo.all(Bid)
   end
 
-  def get_highest_bid(item_id) do
-    query = from bid in Bid, where: ^item_id == bid.item_id, order_by: [desc: bid.bid_price], limit: 1
-    bid = Repo.one(query)
+  def get_highest_bid_price(item_id) do
+    bid = get_highest_bid(item_id)
     if (bid), do: bid.bid_price
+  end
+
+  def get_highest_bidder_user_id(item_id) do
+    bid = get_highest_bid(item_id)
+    if (bid), do: bid.user_id
+  end
+
+  defp get_highest_bid(item_id) do
+    query = from bid in Bid, where: ^item_id == bid.item_id, order_by: [desc: bid.bid_price], limit: 1
+    Repo.one(query)
   end
 
   def list_bids_by_item(item_uuid) do
@@ -26,6 +34,14 @@ defmodule RebayApi.UserItem do
     bidUser = Accounts.get_user!(user_uuid)
     user_item_ids = user_item_ids_query(bidUser.id) |> get_all_bids_by
     get_users_bids_by_items(user_item_ids, bidUser.id)
+  end
+
+  def get_auto_bids_by_item(item_id) do
+    item_highest_bid = get_highest_bid_price(item_id)
+    query = from bid in Bid,
+              where: ^item_id == bid.item_id and not is_nil(bid.max_bid_price) and bid.max_bid_price > ^item_highest_bid,
+              order_by: [desc: bid.updated_at]
+    Repo.all(query, preload: [:bid])
   end
 
   defp get_users_bids_by_items(user_item_ids, user_id) do

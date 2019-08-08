@@ -32,11 +32,43 @@ defmodule RebayApiWeb.BidController do
     |> Map.put("uuid", Ecto.UUID.generate())
 
     with {:ok, %Bid{} = bid} <- UserItem.create_bid(bid_params) do
+      handle_auto_bids(item.id)
+
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.item_bid_path(conn, :show, item.uuid, bid))
       |> render("show.json", bid: bid)
     end
+  end
+
+  defp handle_auto_bids(item_id) do
+    item_id
+    |> UserItem.get_auto_bids_by_item
+    |> run_auto_bids(item_id)
+
+    case length(item_id |> UserItem.get_auto_bids_by_item) do
+      0 -> nil
+      1 -> nil
+      _ -> handle_auto_bids(item_id)
+    end
+  end
+
+  defp run_auto_bids(bids, item_id) do
+    bids
+    |> Enum.each(fn bid ->
+      last_bidders_id = UserItem.get_highest_bidder_user_id(item_id)
+      price_increment = 100
+      next_bid_price = UserItem.get_highest_bid_price(item_id) + price_increment
+      if bid.max_bid_price >= next_bid_price && bid.user_id != last_bidders_id do
+        new_bid = %{
+          user_id: bid.user_id,
+          item_id: item_id,
+          bid_price: next_bid_price,
+          uuid: Ecto.UUID.generate()
+        }
+        UserItem.create_bid(new_bid)
+      end
+    end)
   end
 
   def show(conn, %{"uuid" => uuid}) do
