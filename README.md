@@ -19,7 +19,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
 
-## Setting up Environment Variables
+## Setting up Environment Variables + Starting Local Server
 -  Create a .env file in your root and add the following
 ```
 export GOOGLE_CLIENT_ID="Get from Teammate"
@@ -27,6 +27,7 @@ export GOOGLE_CLIENT_SECRET="Get from Teammate"
 export CLIENT_HOST=http://localhost:<client_port>
 ```
 - `source .env`
+- `mix phx.server`
 
 # Seeding Postgres Data
 `mix ecto.migrate`
@@ -39,34 +40,24 @@ mix ecto.migrate
 mix run priv/repo/seeds.exs
 ```
 
-## Deployment
-Environmental Variables ($HEROKU_API_KEY and $HEROKU_APP_NAME) for Deployment are stored in CircleCI.
+## Deployment with Heroku CLI
+```
+git push heroku feature/add_bid:master --push
+```
+
+If you hit `{"errors":{"detail":"Not Found"}}`:
+```
+heroku run "POOL_SIZE=2 mix ecto.migrate"
+heroku run "POOL_SIZE=2 mix run priv/repo/seeds.exs"
+```
+
+### If you need to drop the deployed database
+```
+heroku pg:reset
+heroku run "POOL_SIZE=2 mix ecto.create"
+heroku run "POOL_SIZE=2 mix ecto.migrate"
+heroku run "POOL_SIZE=2 mix run priv/repo/seeds.exs"
+```
 
 ### Generate a new API Token
 `heroku authorizations:create`
-
-###$ [Setting an Environment Variable in a CircleCI Project](https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project)
-In the CircleCI application, go to your project’s settings by clicking the gear icon next to your project.
-
-In the Build Settings section, click on Environment Variables.
-
-Import variables from another project by clicking the Import Variable(s) button. Add new variables by clicking the Add Variable button. (Note: The Import Variables(s) button is not currently available on CircleCI installed in your private cloud or datacenter.)
-
-Use your new environment variables in your .circleci/config.yml file. For an example, see the Heroku deploy walkthrough.
-
-Once created, environment variables are hidden and uneditable in the application. Changing an environment variable is only possible by deleting and recreating it.
-
-# Common Issues
-### After Heroku Deployment, If you receive a `500 Internal Server Error`
-1. go to project directory and run `heroku run "POOL_SIZE=2 mix ecto.migrate"`
-2. If your database is empty, you can add your seeds by running `heroku run "POOL_SIZE=2 mix run priv/repo/seeds.exs"`
-
-### If your tests pass but the server returns "UUID IS NULL" errors
-It probably has to do with the seed data stored in your database.
-Drop your `rebay_api_dev` database either through terminal or pgadmin4.
-Then run:
-```
-mix ecto.create
-mix ecto.migrate
-mix run priv/repo/seeds.exs
-```

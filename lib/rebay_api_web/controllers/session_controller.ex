@@ -28,7 +28,7 @@ defmodule RebayApiWeb.SessionController do
   def delete(conn, _params) do
     conn
     |> configure_session(drop: true)
-    |> redirect(external: "#{@client_host}")
+    |> redirect(to: Routes.item_path(conn, :index))
   end
 
   defp user_params(auth, provider) do

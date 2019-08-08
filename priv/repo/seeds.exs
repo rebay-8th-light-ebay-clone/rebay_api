@@ -15,7 +15,6 @@ alias RebayApi.Listings.Item
 alias RebayApi.Accounts.User
 alias RebayApi.UserItem.Bid
 
-# date = DateTime.utc_now() |> DateTime.truncate(:second)
 {:ok, date, _} = DateTime.from_iso8601("2019-08-17T06:59:59.000Z")
 date = date |> DateTime.truncate(:second)
 
@@ -148,3 +147,47 @@ bid_3_for_item_2 = %Bid{
 }
 Repo.insert!(bid_3_for_item_2)
 bid_3_for_item_2 = Repo.get_by(Bid, uuid: bid_3_for_item_2.uuid)
+
+user2 = %User{
+  avatar: "image-url.foo",
+  email: "travis@foo.fake",
+  first_name: "Travis",
+  provider: "google",
+  uuid: Ecto.UUID.generate(),
+}
+Repo.insert!(user2)
+
+user2 = Repo.get_by(User, uuid: user2.uuid)
+
+
+{:ok, date, _} = DateTime.from_iso8601("2019-08-05T15:30:59.000Z")
+past_date = date |> DateTime.truncate(:second)
+
+item4 = %Item{
+  title: "Raleigh 2018 Alysa 1 Urban Fitness Bike Orange",
+  description: "If you love the idea of a lightweight, nimble road bike but prefer the sturdy, stable handling and upright position of a mountain bike, the Alysa 1 is for you. This step-thru, flat bar women’s fitness bike is made to put in miles along the bike path, ride through the city on your way to work, and go everywhere in between. The 700c wheels keep the ride quick and efficient while flat handlebars and sporty geometry make it stable and comfortable.
+
+  The women’s specific frame is lightweight and durable with special geometry designed for your comfort. Plus the step thru design makes for easy on an off (and accepts bike clothes of the skirted variety). This all around fitness bike offers fast and smooth 35c tires that are wide enough to provide traction for an enjoyable path ride, organized ride, or your commute. With 21 speeds, rack and fender mounts, and strong double wall wheels you’ll always be equipped for your next two-wheel adventure.",
+  end_date: past_date,
+  image: "https://i.ebayimg.com/images/g/WfMAAOSwSVNcAZZE/s-l1600.jpg",
+  price: 30000,
+  category: "Sporting Goods",
+  uuid: Ecto.UUID.generate(),
+  user_id: user2.id,
+}
+Repo.insert!(item4)
+_item4 = Repo.get_by(Item, uuid: item4.uuid)
+
+
+item5 = %Item{
+  title: "Zinus 8 Inch Spring Mattress with Quilted Cover, Twin",
+  description: "Enjoy a restful night’s sleep with the Zinus 8 Inch Tight Top Spring Mattress. Made with exclusive iCoil springs for reduced motion transfer and uninterrupted sleep, this design also features a 1” top layer of comfort foam and microfiber quilting for added softness. Compressed and rolled into one box for easy shipping and unpacking, the 8 Inch Spring Mattress with Quilted Cover is made to be as convenient as it is comfortable.",
+  end_date: past_date,
+  image: "https://i.ebayimg.com/images/g/QxEAAOSwRLRdG9Tj/s-l1600.jpg",
+  price: 8900,
+  category: "Home & Garden",
+  uuid: Ecto.UUID.generate(),
+  user_id: user2.id,
+}
+Repo.insert!(item5)
+_item5 = Repo.get_by(Item, uuid: item5.uuid)

@@ -37,7 +37,7 @@ defmodule RebayApi.Listings.Item do
     |> validate_required([:title, :description, :image, :price, :category, :end_date, :uuid])
   end
 
-  def validate_end_date(changeset) do
+  defp validate_end_date(changeset) do
     validate_change(changeset, :end_date, fn :end_date, end_date ->
       {:ok, current_date} = DateTime.now("Etc/UTC")
       case DateTime.compare(end_date, current_date) do
@@ -49,7 +49,7 @@ defmodule RebayApi.Listings.Item do
     end)
   end
 
-  def validate_price(changeset) do
+  defp validate_price(changeset) do
     validate_change(changeset, :price, fn :price, price ->
       cond do
         price < 100 ->
@@ -60,13 +60,13 @@ defmodule RebayApi.Listings.Item do
     end)
   end
 
-  def forbid_price_update(changeset) do
+  defp forbid_price_update(changeset) do
     validate_change(changeset, :price, fn :price, _price ->
       [price: "cannot be modified"]
     end)
   end
 
-  def forbid_end_date_update(changeset) do
+  defp forbid_end_date_update(changeset) do
     validate_change(changeset, :end_date, fn :end_date, _end_date ->
       [end_date: "cannot be modified"]
     end)

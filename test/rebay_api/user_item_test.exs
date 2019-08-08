@@ -6,48 +6,41 @@ defmodule RebayApi.UserItemTest do
   alias RebayApi.UserItem.Bid
 
   describe "bids" do
-    @uuid Ecto.UUID.generate()
     @user_uuid Ecto.UUID.generate()
-    @valid_attrs %{bid_price: 42, uuid: @uuid}
-    @invalid_attrs %{bid_price: nil}
-
-    def bid_fixture(attrs \\ %{}) do
-      {:ok, bid} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> UserItem.create_bid()
-
-      bid
-    end
+    @item_uuid Ecto.UUID.generate()
+    @item_id 10
+    @invalid_attrs %{bid_price: nil, item_id: nil, user_id: nil, uuid: nil}
 
     def many_bids_fixture() do
       user = TestHelpers.user_fixture(%{uuid: @user_uuid})
       item1 = TestHelpers.item_fixture(%{
         title: "item 1 title",
         user_id: user.id,
-        end_date: "2020-08-31T06:59:59Z"
+        end_date: "2020-08-31T06:59:59Z",
+        uuid: @item_uuid,
+        id: @item_id
       })
       item2 = TestHelpers.item_fixture(%{
         title: "item 2 title",
         user_id: user.id,
         end_date: "2020-08-31T06:59:59Z"
       })
-      bid1 = bid_fixture(%{
+      bid1 = TestHelpers.bid_fixture(%{
         bid_price: 1,
         user_id: user.id,
         item_id: item1.id
       })
-      bid2 = bid_fixture(%{
+      bid2 = TestHelpers.bid_fixture(%{
         bid_price: 2,
         user_id: user.id,
         item_id: item1.id
       })
-      bid3 = bid_fixture(%{
+      bid3 = TestHelpers.bid_fixture(%{
         bid_price: 3,
         user_id: user.id,
         item_id: item2.id
       })
-      bid4 = bid_fixture(%{
+      bid4 = TestHelpers.bid_fixture(%{
         bid_price: 4,
         user_id: user.id,
         item_id: item2.id
@@ -55,18 +48,37 @@ defmodule RebayApi.UserItemTest do
       [bid1, bid2, bid3, bid4]
     end
 
+    test "get_highest_bid/1 returns max bid number" do
+      user = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: user.id})
+
+      UserItem.create_bid(%{bid_price: 43, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 44, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 45, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      highestBid = UserItem.get_highest_bid(item.id);
+      assert highestBid == 45
+    end
+    
+    test "get_highest_bid/1 returns nil when there are no bids" do
+      user = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: user.id})
+  
+      highestBid = UserItem.get_highest_bid(item.id);
+      assert highestBid == nil
+    end
+
     test "list_bids/0 returns all bids" do
-      bid = bid_fixture()
+      bid = TestHelpers.bid_fixture()
       assert UserItem.list_bids() == [bid]
     end
 
     test "get_bid!/1 returns the bid with given id" do
-      bid = bid_fixture()
+      bid = TestHelpers.bid_fixture()
       assert UserItem.get_bid!(bid.uuid) == bid
     end
 
     test "create_bid/1 with valid data creates a bid" do
-      assert {:ok, %Bid{} = bid} = UserItem.create_bid(@valid_attrs)
+      assert bid = TestHelpers.bid_fixture()
       assert bid.bid_price == 42
     end
 
@@ -74,8 +86,46 @@ defmodule RebayApi.UserItemTest do
       assert {:error, %Ecto.Changeset{}} = UserItem.create_bid(@invalid_attrs)
     end
 
+    test "create_bid/1 with invalid price returns error changeset" do
+      bid = TestHelpers.bid_fixture()
+      initial_bid = Repo.get_by!(Bid, uuid: bid.uuid)
+      |> Repo.preload(:user)
+      |> Repo.preload(:item)
+
+      user = initial_bid.user
+      item = initial_bid.item
+
+      UserItem.create_bid(%{bid_price: 43, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 44, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+      UserItem.create_bid(%{bid_price: 45, uuid: Ecto.UUID.generate(), user_id: user.id, item_id: item.id})
+
+      invalid_create_attrs = %{
+        bid_price: 45,
+        item_id: item.id,
+        user_id: user.id,
+        uuid: Ecto.UUID.generate()
+      }
+
+      assert {:error, %Ecto.Changeset{}} = UserItem.create_bid(invalid_create_attrs)
+    end
+
+    test "create_bid/1 with invalid date returns error changeset" do
+      user = TestHelpers.user_fixture()
+      item = TestHelpers.item_fixture(%{user_id: user.id, end_date: "2020-07-31T06:59:59.000Z"})
+
+      invalid_create_attrs = %{
+        bid_price: 42,
+        item_id: item.id,
+        user_id: user.id,
+        uuid: Ecto.UUID.generate(),
+        timestamp: "2020-08-31T06:59:59.000Z"
+      }
+
+      assert {:error, %Ecto.Changeset{}} = UserItem.create_bid(invalid_create_attrs)
+    end
+
     test "change_bid/1 returns a bid changeset" do
-      bid = bid_fixture()
+      bid = TestHelpers.bid_fixture()
       assert %Ecto.Changeset{} = UserItem.change_bid(bid)
     end
 

@@ -4,9 +4,16 @@ defmodule RebayApi.UserItem do
   alias RebayApi.UserItem.Bid
   alias RebayApi.Listings
   alias RebayApi.Accounts
+  alias RebayApi.Listings.Item
 
   def list_bids do
     Repo.all(Bid)
+  end
+
+  def get_highest_bid(item_id) do
+    query = from bid in Bid, where: ^item_id == bid.item_id, order_by: [desc: bid.bid_price], limit: 1
+    bid = Repo.one(query)
+    if (bid), do: bid.bid_price
   end
 
   def list_bids_by_item(item_uuid) do

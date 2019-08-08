@@ -13,9 +13,9 @@ defmodule RebayApiWeb.Plugs.AuthorizeUser do
       conn
     else
       conn
-      |> put_status(:unauthorized)
+      |> put_status(:forbidden)
       |> put_view(RebayApiWeb.ErrorView)
-      |> render("401.json")
+      |> render("403.json")
       |> halt()
     end
   end
