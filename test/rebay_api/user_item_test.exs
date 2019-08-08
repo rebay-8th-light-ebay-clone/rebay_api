@@ -4,13 +4,11 @@ defmodule RebayApi.UserItemTest do
   alias RebayApi.UserItem
   alias RebayApi.TestHelpers
   alias RebayApi.UserItem.Bid
-  alias RebayApi.Accounts.Item
 
   describe "bids" do
     @uuid Ecto.UUID.generate()
     @user_uuid Ecto.UUID.generate()
     @valid_attrs %{bid_price: 42, uuid: @uuid}
-    @update_attrs %{bid_price: 43}
     @invalid_attrs %{bid_price: nil}
 
     def bid_fixture(attrs \\ %{}) do
@@ -26,11 +24,13 @@ defmodule RebayApi.UserItemTest do
       user = TestHelpers.user_fixture(%{uuid: @user_uuid})
       item1 = TestHelpers.item_fixture(%{
         title: "item 1 title",
-        user_id: user.id
+        user_id: user.id,
+        end_date: "2020-08-31T06:59:59Z"
       })
       item2 = TestHelpers.item_fixture(%{
         title: "item 2 title",
-        user_id: user.id
+        user_id: user.id,
+        end_date: "2020-08-31T06:59:59Z"
       })
       bid1 = bid_fixture(%{
         bid_price: 1,
@@ -74,31 +74,13 @@ defmodule RebayApi.UserItemTest do
       assert {:error, %Ecto.Changeset{}} = UserItem.create_bid(@invalid_attrs)
     end
 
-    test "update_bid/2 with valid data updates the bid" do
-      bid = bid_fixture()
-      assert {:ok, %Bid{} = bid} = UserItem.update_bid(bid, @update_attrs)
-      assert bid.bid_price == 43
-    end
-
-    test "update_bid/2 with invalid data returns error changeset" do
-      bid = bid_fixture()
-      assert {:error, %Ecto.Changeset{}} = UserItem.update_bid(bid, @invalid_attrs)
-      assert bid == UserItem.get_bid!(bid.uuid)
-    end
-
-    test "delete_bid/1 deletes the bid" do
-      bid = bid_fixture()
-      assert {:ok, %Bid{}} = UserItem.delete_bid(bid)
-      assert_raise Ecto.NoResultsError, fn -> UserItem.get_bid!(bid.uuid) end
-    end
-
     test "change_bid/1 returns a bid changeset" do
       bid = bid_fixture()
       assert %Ecto.Changeset{} = UserItem.change_bid(bid)
     end
 
     test "list_bids_by_user/1 returns user bids by item" do
-      bids = many_bids_fixture()
+      _bids = many_bids_fixture()
       user_bids = UserItem.list_bids_by_user(@user_uuid);
       assert length(user_bids) == 2
 
@@ -109,8 +91,8 @@ defmodule RebayApi.UserItemTest do
 
       item2 = user_bids
       |> Enum.at(1)
-      assert length(item1 |> Map.get(:bids)) == 2
-      assert item1 |> Map.has_key?(:item) == true
+      assert length(item2 |> Map.get(:bids)) == 2
+      assert item2 |> Map.has_key?(:item) == true
     end
   end
 end

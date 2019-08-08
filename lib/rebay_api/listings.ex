@@ -1,8 +1,8 @@
 defmodule RebayApi.Listings do
   import Ecto.Query, warn: false
   alias RebayApi.Repo
-
   alias RebayApi.Listings.Item
+  alias RebayApi.Accounts
 
   def list_items do
     Repo.all(Item)
@@ -12,9 +12,15 @@ defmodule RebayApi.Listings do
 
   def get_item_by_id!(id), do: Repo.get_by!(Item, id: id)
 
+  def get_items_by_user(user_uuid) do
+    fetchedUser = Accounts.get_user!(user_uuid)
+    query = from item in Item, where: ^fetchedUser.id == item.user_id
+    Repo.all(query, preload: [:user])
+  end
+
   def create_item(attrs \\ %{}) do
     %Item{}
-    |> Item.create_changeset(attrs)
+    |> Item.changeset(attrs)
     |> Repo.insert()
   end
 

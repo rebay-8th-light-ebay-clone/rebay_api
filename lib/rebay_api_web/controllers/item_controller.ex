@@ -4,15 +4,22 @@ defmodule RebayApiWeb.ItemController do
   alias RebayApi.Accounts
   alias RebayApi.Listings
   alias RebayApi.Listings.Item
+  alias RebayApi.Repo
 
   action_fallback RebayApiWeb.FallbackController
 
-  plug :authenticate_session when action in [:create, :update, :delete]
-  plug :authorize_user when action in [:create, :update, :delete]
+  plug RebayApiWeb.Plugs.AuthenticateSession when action in [:create, :update, :delete]
+  plug RebayApiWeb.Plugs.AuthorizeUser when action in [:create, :update, :delete]
+  plug :authorize_change when action in [:update, :delete]
 
   def index(conn, _params) do
     items = Listings.list_items()
     render(conn, "index.json", items: items)
+  end
+  
+  def index_by_user(conn, %{"user_uuid" => user_uuid}) do
+    user_items = Listings.get_items_by_user(user_uuid)
+    render(conn, "index.json", items: user_items)
   end
 
   def create(conn, params) do
@@ -50,27 +57,12 @@ defmodule RebayApiWeb.ItemController do
     end
   end
 
-  defp authenticate_session(conn, _) do
-    conn = fetch_cookies(conn, [:session_id]) 
-    session_cookie = conn.cookies["session_id"]
-    session_id = get_session(conn, :id)
+  defp authorize_change(conn, _params) do
+    user_uuid = conn.params["user_uuid"]
+    item = Listings.get_item!(conn.params["uuid"])
+    |> Repo.preload(:user)
 
-    if conn.assigns[:user] && session_cookie == session_id do
-      conn
-    else
-      conn
-      |> put_status(:unauthorized)
-      |> put_view(RebayApiWeb.ErrorView)
-      |> render("401.json")
-      |> halt()
-    end
-  end
-
-  defp authorize_user(conn, _) do
-    user_uuid_param = conn.params["user_uuid"]
-    current_user = conn.assigns[:user]
-
-    if current_user != nil && user_uuid_param == current_user.uuid do
+    if user_uuid == item.user.uuid do
       conn
     else
       conn

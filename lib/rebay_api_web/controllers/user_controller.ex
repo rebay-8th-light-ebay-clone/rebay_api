@@ -24,20 +24,4 @@ defmodule RebayApiWeb.UserController do
     user = Accounts.get_user!(uuid)
     render(conn, "show.json", user: user)
   end
-
-  def update(conn, %{"uuid" => uuid, "user" => user_params}) do
-    user = Accounts.get_user!(uuid)
-
-    with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
-      render(conn, "show.json", user: user)
-    end
-  end
-
-  def delete(conn, %{"uuid" => uuid}) do
-    user = Accounts.get_user!(uuid)
-
-    with {:ok, %User{}} <- Accounts.delete_user(user) do
-      send_resp(conn, :no_content, "")
-    end
-  end
 end

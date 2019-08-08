@@ -10,6 +10,8 @@ defmodule RebayApi.Accounts do
 
   def get_user!(uuid), do: Repo.get_by!(User, uuid: uuid)
 
+  def get_user_by_id!(id), do: Repo.get_by!(User, id: id)
+
   def create_user(attrs \\ %{}) do
     %User{}
     |> User.changeset(attrs)

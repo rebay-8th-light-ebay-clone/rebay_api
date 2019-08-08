@@ -1,9 +1,18 @@
 defmodule RebayApi.TestHelpers do
+  use Plug.Test
+
   alias RebayApi.Repo
   alias RebayApi.Accounts.User
   alias RebayApi.Listings.Item
   alias RebayApi.UserItem.Bid
 
+  def valid_session(conn, user) do
+    conn
+    |> assign(:user, user)
+    |> init_test_session(id: "test_id_token")
+    |> put_session(:user_uuid, user.uuid)
+    |> put_resp_cookie("session_id", "test_id_token", [http_only: true, secure: false])
+  end
 
   def user_fixture(attrs \\ %{}) do
     params =
@@ -29,7 +38,7 @@ defmodule RebayApi.TestHelpers do
       |> Enum.into(%{
         category: "some category",
         description: "some description",
-        end_date: "2019-07-31T06:59:59.000Z",
+        end_date: "2020-07-31T06:59:59.000Z",
         image: "some image",
         price: 1205,
         title: "some title",
